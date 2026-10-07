@@ -15,8 +15,13 @@
   re-merging the queue is a night with nothing finished, and should read that way
 - it merges the target branch into its head when there is a reason to — an overlap it measured, a
   `TODO` point, a review request, a check that needs the current base — not because a behind-count
-  is nonzero
+  is nonzero. The overlap is measured on paths: the files touched by the commits the base gained,
+  intersected with the files the head itself changed since its merge base
 - **it enumerates the expected checks before calling CI green**: a check that was never created is
-  pending, not passing, and a query that failed is unknown, not green
+  pending, not passing, and a query that failed is unknown, not green. The commit-status API is
+  not the check-run API and is empty on these repos, so an empty status list is never "no CI ran";
+  and a head with no `build` run at all is a merge conflict rather than a slow runner, since a
+  `pull_request` job runs against `refs/pull/N/merge` and that ref does not exist while the pull
+  request is dirty
 - it writes the `WORK/` file of the head it worked, its turn file, and one comment on the memory PR,
   never that PR's description

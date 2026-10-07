@@ -219,10 +219,18 @@ def memory(repo):
     having merged the past days, which is theirs and no finding of ours; two
     under one title is a day written twice, which is ours. The count and the
     URLs are printed either way, so a turn sees what is waiting to be merged
-    without the sweep calling it dirty."""
+    without the sweep calling it dirty. When any are open the newest is named
+    as the branch to cut a new day's PR from, not `main`, so unmerged days
+    stack rather than conflict on `README.md`/`USER_TODO.md` (desire#144)."""
     open_prs = get(repo, "pulls?state=open")
     print(f"{repo}: {len(open_prs)} open PR(s)"
           + "".join("\n  " + pr["html_url"] for pr in open_prs), file=sys.stderr)
+    if open_prs:
+        newest = max(open_prs, key=lambda pull: pull["created_at"])
+        print(f"{repo}: base a new day's PR on {newest['head']['ref']!r}"
+              f" ({newest['title']!r}, the newest still open), not main, so"
+              " unmerged days stack rather than conflict (desire#144)",
+              file=sys.stderr)
     days = {}
     for pull in open_prs:
         days.setdefault(pull["title"], []).append(pull["html_url"])

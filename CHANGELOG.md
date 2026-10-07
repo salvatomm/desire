@@ -3,6 +3,38 @@
 What landed on `main`, newest first — when each rule started binding, and what it replaced.
 Entries state the changes, no explanation of why.
 
+## 2026-09-09
+
+**A repo joins WORK_REPOS the turn work starts there, no separate ask**
+([#151](https://github.com/toumix/desire/pull/151), closes
+[#150](https://github.com/toumix/desire/issues/150)) — `AGENTS.md`'s Config section gains the
+rule.
+
+**Eight conventions graduate out of the holding pen**
+([#139](https://github.com/toumix/desire/pull/139), closes
+[#115](https://github.com/toumix/desire/issues/115)) — the 189 lines evicted from the board on
+08-26 are sorted and the pile is emptied. `AGENTS.md` gains four: the gate is USER's review time
+and no turn proposes a batch; trust settles whether to act while evidence settles what is true; a
+claim is measured rather than inferred from a green suite or from a "blocked" someone wrote down;
+and `git merge-tree` with the base on one side is degenerate, so it measures a pair rather than a
+branch against its base. `RULES.md` gains two: rule 1 that a review bot's severity is not evidence
+and that rule 1 outranks it, rule 2 that draft state is not a readiness signal. `EVENING.md` gains
+two: the overlap that justifies a re-merge is measured on paths, and the commit-status API is not
+the check-run API — a head with no `build` run is a merge conflict, not a slow runner. The rest of
+the pile is dropped, each entry either already carried by the prompts, replaced by
+`WORK/<repo>/<number>.md` and the one-memory-PR-per-day rule, or state rather than convention.
+
+## 2026-09-08
+
+**A new day's PR stacks on the newest still-open one, not on `main`** (`AGENTS.md`,
+`template/memory/.agents/skills/sweep/sweep.py`) — the day-PR paragraph now says a new day's branch
+is cut from the newest still-open day PR's branch whenever a previous day's is unmerged, so the
+per-turn `README.md`/`USER_TODO.md` rewrites fast-forward instead of conflicting. `sweep.py`'s
+`memory()` prints that branch when any day PR is open. Closes
+[#144](https://github.com/toumix/desire/issues/144), the gap that cost three turns a hand-fold
+(09-01, 09-03, 09-07); the "several day PRs open at once is USER not having merged" ruling is
+unchanged — siblings are still not a finding.
+
 ## 2026-09-03
 
 **The MEMORY_REPO day-PR-branch rule is standing permission, not a per-turn ask** (`AGENTS.md`) —
