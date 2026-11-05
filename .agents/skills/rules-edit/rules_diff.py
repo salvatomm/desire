@@ -44,6 +44,8 @@ def config(path):
         if not separator or not key.strip():
             raise ValueError(f"config.env: no key in {line!r}")
         setup[key.strip()] = value.strip()
+    if not setup.get("USER") or not setup.get("AGENT"):
+        raise ValueError(f"{path}: no USER or AGENT")
     setup["WORK_REPOS"] = [r.strip() for r in setup.get("WORK_REPOS", "").split(",") if r.strip()]
     return setup
 
@@ -76,25 +78,28 @@ def hits(line, always, names):
         word(n).search(line) or re.search(rf"(?<![\w-]){re.escape(n)}#\d", line, re.I))]
 
 
-def git(repo, *args):
-    """A git command's stdout, raising Unread when it fails."""
+def git(repo, *args, ok=(0,)):
+    """A git command's stdout, raising Unread on an exit code not in `ok`."""
     run = subprocess.run(["git", "-C", str(repo), *args], capture_output=True, text=True)
-    if run.returncode:
+    if run.returncode not in ok:
         raise Unread(f"git {' '.join(args[:2])}: {run.stderr.strip()[:120]}")
     return run.stdout
 
 
 def parse(diff):
     """A unified -U0 diff as (path, sign, line number, text) tuples."""
-    path, number = None, 0
+    path, number, header = None, 0, False
     for line in diff.splitlines():
-        if line.startswith("--- "):
+        if line.startswith("diff --git "):
+            path, header = None, True
+        elif header and line.startswith("--- "):
             path = line[6:] if line.startswith("--- a/") else None
-        elif line.startswith("+++ "):
+        elif header and line.startswith("+++ "):
             path = line[6:] if line.startswith("+++ b/") else path
         elif line.startswith("@@"):
+            header = False
             number = int(re.search(r"\+(\d+)", line).group(1))
-        elif path and line[:1] in "+-":
+        elif path and not header and line[:1] in "+-":
             yield path, line[0], number, line[1:]
             number += line[0] == "+"
 
@@ -203,11 +208,8 @@ def survivors(repo, head, removed, texts, deleted):
     gone = sorted({n for path, names in removed.items() if path not in deleted
                    for n in names if not word(n).search(texts.get(path, ""))})
     for name in gone:
-        run = subprocess.run(["git", "-C", str(repo), "grep", "-cF", name, head, "--",
-                              ".", f":!{CHANGELOG}"], capture_output=True, text=True)
-        if run.returncode > 1:
-            raise Unread(f"git grep {name}: {run.stderr.strip()[:120]}")
-        places = [line.partition(":")[2] for line in run.stdout.splitlines()]
+        found = git(repo, "grep", "-cF", name, head, "--", ".", f":!{CHANGELOG}", ok=(0, 1))
+        places = [line.partition(":")[2] for line in found.splitlines()]
         if places:
             yield f"`{name.rstrip('(')}` left a file and is still in {', '.join(places)}"
 
@@ -247,12 +249,12 @@ def check(repo, base, head, setup, allow):
     always, names = values(setup)
     span = f"{base}...{head}"
     changes = list(parse(git(repo, "diff", "--no-color", "-U0", "--no-ext-diff", span)))
-    tree = git(repo, "grep", "-hI", "-e", ".", base, "--", ".", f":!{CHANGELOG}")
+    tree = git(repo, "grep", "-hI", "-e", ".", base, "--", ".", f":!{CHANGELOG}", ok=(0, 1))
     names = [n for n in names if n not in generic(tree.splitlines(), always, names)
              and n.lower() not in allow]
     findings = list(leaks(changes, always, names))
     deleted = set(git(repo, "diff", "--name-only", "--diff-filter=D", span).split())
-    rules = git(repo, "grep", "-h", "-e", "^", head, "--", "*.md", f":!{CHANGELOG}")
+    rules = git(repo, "grep", "-h", "-e", "^", head, "--", "*.md", f":!{CHANGELOG}", ok=(0, 1))
     texts = {path: show(repo, head, path) for path in {c[0] for c in changes}}
     advice = report("reason in the changelog", list(causal(changes)))
     advice += report("new comments", list(comments(changes)))

@@ -15,13 +15,15 @@ a rules PR to one round.
 2. **Quote USER verbatim**, with the link. Change only what those words cover:
    - a deletion stays a deletion: delete the line, put nothing in its place;
    - no clause about something USER did not raise (no new `never`, `rather than`, `instead of`);
-   - no reason, history or provenance in a rule: that goes in the changelog entry, as USER's quote;
+   - no reason, history or provenance in a rule ([AGENTS.md](../../../AGENTS.md)): USER's quote
+     goes in the changelog entry;
    - a rule lives in one file and the others link it: `lint.py` fails on any 8-word run two rule
      files share;
    - no installation values (USER, AGENT, repo names, private links): the repo is forkable.
-3. **Keep copies in step.** A file under [`template/`](../../../template) changes with its live
-   copy in the same turn ([Finding config.env](../../../OPERATIONS.md#finding-configenv)), and
-   `lint.py --memory <MEMORY_REPO clone>` checks the ones it lists.
+3. **Keep copies in step.** When a file under [`template/`](../../../template) changes, change
+   its copy in the MEMORY_REPO clone the same turn
+   ([Finding config.env](../../../OPERATIONS.md#finding-configenv)), and run
+   `lint.py --memory <MEMORY_REPO clone>`, which fails on a listed copy that differs.
 4. **After a rename or a cut, re-read every changed sentence whole**: articles (`a item`), a
    condition the old wording carried, a name that still appears elsewhere.
 5. **Write the changelog entry.** Copy the shape of the top entries of
@@ -40,7 +42,7 @@ a rules PR to one round.
        --repo <DESIRE_REPO clone>
    ```
 
-   `rules_diff.py <base>` reads `git diff <base>...HEAD` (`--head REF` for another tip,
+   `rules_diff.py <base>` reads commits only, `git diff <base>...HEAD` (`--head REF` for another branch,
    `--config FILE` or `AGENTS_CONFIG` for another config). Exit 0 clean, 1 findings, 2 a read
    failed (`n/a`, not clean).
    - **Finding**: an added line outside `CHANGELOG.md` naming USER, AGENT, AGENT_EMAIL, an owner
@@ -49,8 +51,8 @@ a rules PR to one round.
      for a word the repo uses in its plain sense.
    - **Advisories**, each to read, not to obey: a reason word in an added changelog line; a new
      comment in `.py`, `.sh` or `.yml`; a new `never`/`instead of` clause, to hold against USER's
-     quote; a removed `only`/`every`/`never`/`unless`/`once` clause no sentence at the tip still
+     quote; a removed `only`/`every`/`never`/`unless`/`once` clause no sentence on the branch still
      says; a backticked name or `def` that left a file and is still used elsewhere; a changelog
-     entry missing, not at the top or not dated today.
+     entry missing, not at the top, or not under the date of the last commit.
 7. **Merge `main` in before asking for approval**, and again whenever another rules PR lands
    first. Re-run step 6 on the merge.

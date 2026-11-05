@@ -69,6 +69,12 @@ class Parse(unittest.TestCase):
         self.assertIn(("AGENTS.md", "+", 4, "Never ask twice."), self.changes)
         self.assertIn(("gone.md", "-", 0, "Every rule here is gone."), self.changes)
 
+    def test_body_lines_that_look_like_headers(self):
+        diff = ("diff --git a/A.md b/A.md\n--- a/A.md\n+++ b/A.md\n@@ -2 +2 @@\n"
+                "--- only once\n+++ acme/x#3\n")
+        self.assertEqual(list(rules_diff.parse(diff)),
+                         [("A.md", "-", 2, "-- only once"), ("A.md", "+", 2, "++ acme/x#3")])
+
     def test_leaks_skip_the_changelog(self):
         changes = [("CHANGELOG.md", "+", 1, "acme"), ("README.md", "+", 2, "acme/x")]
         found = list(rules_diff.leaks(changes, ["acme"], []))
@@ -126,12 +132,13 @@ class Config(unittest.TestCase):
     def test_parse(self):
         with tempfile.TemporaryDirectory() as folder:
             path = pathlib.Path(folder) / "config.env"
-            path.write_text("# seed\nUSER=alice\nWORK_REPOS=a/b, c/d\n")
+            path.write_text("# seed\nUSER=alice\nAGENT=bots\nWORK_REPOS=a/b, c/d\n")
             self.assertEqual(rules_diff.config(path),
-                             {"USER": "alice", "WORK_REPOS": ["a/b", "c/d"]})
-            path.write_text("no separator\n")
-            with self.assertRaises(ValueError):
-                rules_diff.config(path)
+                             {"USER": "alice", "AGENT": "bots", "WORK_REPOS": ["a/b", "c/d"]})
+            for text in ("no separator\n", "WORK_REPOS=a/b\n", ""):
+                path.write_text(text)
+                with self.assertRaises(ValueError):
+                    rules_diff.config(path)
 
 
 class Run(unittest.TestCase):
