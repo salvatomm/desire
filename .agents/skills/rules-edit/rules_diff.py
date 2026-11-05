@@ -132,7 +132,7 @@ def comments(changes):
     for path, sign, number, text in changes:
         stripped = text.strip()
         if sign == "+" and path and path.endswith(COMMENTED) \
-                and stripped.startswith("#") and not stripped.startswith("#!"):
+                and re.match(r"#(?:\s|$)", stripped):
             yield f"{path}:{number}: comment: {stripped[:80]}"
 
 

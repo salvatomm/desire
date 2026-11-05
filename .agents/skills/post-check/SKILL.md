@@ -24,8 +24,7 @@ What it finds:
   [Issues and reviews](../../../OPERATIONS.md#issues-and-reviews).
 - **Footer**: the last non-empty line carries exactly one AGENT_FOOTERS marker, read as
   [Matching an attribution footer](../../../OPERATIONS.md#matching-an-attribution-footer) says;
-  a second footer line higher up is a finding too. A bare URL line does not count: put the URL
-  inside a Markdown link whose target holds the marker.
+  a bare URL line counts as a link target. A second footer line higher up is a finding too.
 - **Public target** (skipped when the target is private): every WORK_REPOS or MEMORY_REPO repo
   named as `owner/repo` or `name#N` that is private or that the token cannot read, and every line
   matching a regex of `--denylist` (one per line, `#` comments), code included. The denylist lives
@@ -43,7 +42,7 @@ Gotchas:
   Check its visibility with the GitHub MCP tools; if it is public, pass `--public owner/repo` and
   run again. Never pass it for a repo you did not check.
 - An unreadable target is treated as public, so every check still runs.
-- A repo named only in words ("the wiki") is not caught.
+- A repo named only in words ("the docs") is not caught.
 
 ## After posting
 

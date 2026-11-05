@@ -26,9 +26,10 @@ DIFF = """diff --git a/AGENTS.md b/AGENTS.md
 diff --git a/tool.py b/tool.py
 --- a/tool.py
 +++ b/tool.py
-@@ -1,0 +2,2 @@
+@@ -1,0 +2,3 @@
 +# explains why
 +#!/not/a/shebang
++## a heading inside a string
 diff --git a/gone.md b/gone.md
 --- a/gone.md
 +++ /dev/null
@@ -81,7 +82,7 @@ class Parse(unittest.TestCase):
         self.assertEqual(len(found), 1)
         self.assertTrue(found[0].startswith("README.md:2"))
 
-    def test_comments_not_shebangs(self):
+    def test_comments_not_shebangs_or_headings(self):
         found = list(rules_diff.comments(self.changes))
         self.assertEqual(len(found), 1)
         self.assertIn("explains why", found[0])

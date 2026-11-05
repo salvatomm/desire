@@ -147,9 +147,10 @@ def mentions(lines, default, words=6):
 
 
 def footer_count(line, setup):
-    """How many AGENT_FOOTERS markers `line` carries, as sweep reads them."""
+    """How many AGENT_FOOTERS markers `line` carries, as sweep reads them, a
+    bare HTTPS URL line read as a link target."""
     line = line.strip().strip("_*")
-    targets = FOOTER_LINK.findall(line)
+    targets = FOOTER_LINK.findall(line) or re.findall(r"^https://\S+$", line)
     return sum((line == marker) + sum(marker in t for t in targets)
                for marker in setup["AGENT_FOOTERS"] if marker)
 

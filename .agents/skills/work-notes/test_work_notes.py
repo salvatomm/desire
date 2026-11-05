@@ -28,7 +28,7 @@ GOOD = """# lib#12 — let statements in closed terms
 - **2026-08-27 🌤️ Daylight** designed the `let` encoding with USER
 """
 SETUP = {"USER": "someone", "AGENT": "someone-agents",
-         "WORK_REPOS": ["org/lib", "org/wiki"], "MEMORY_REPO": "someone/memory",
+         "WORK_REPOS": ["org/lib", "org/docs"], "MEMORY_REPO": "someone/memory",
          "DESIRE_REPO": "someone/desire"}
 
 
@@ -207,12 +207,12 @@ class Touched(unittest.TestCase):
 
     def test_a_failed_read_is_incomplete_not_clean(self):
         def search(agent, repo, since):
-            if repo == "org/wiki":
+            if repo == "org/docs":
                 raise urllib.error.HTTPError("u", 403, "Forbidden", {}, None)
             return []
         code, out = self.run_touched(search)
         self.assertEqual(code, 2)
-        self.assertIn("org/wiki: n/a (403)", out)
+        self.assertIn("org/docs: n/a (403)", out)
 
     def test_findings_and_skeleton(self):
         def search(agent, repo, since):
