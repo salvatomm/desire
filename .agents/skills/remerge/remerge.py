@@ -43,7 +43,8 @@ def git(repo, *args, ok=(0,), feed=None):
     done = subprocess.run(["git", "-C", repo, "-c", "core.quotePath=false", *args],
                           capture_output=True, text=True, input=feed)
     if done.returncode not in ok:
-        raise Stop(f"git {' '.join(args)}: n/a (exit {done.returncode}) {done.stderr.strip()}")
+        said = re.sub(r"://[^/@\s]+@", "://", done.stderr.strip())
+        raise Stop(f"git {' '.join(args)}: n/a (exit {done.returncode}) {said}")
     return done.stdout if ok == (0,) else (done.returncode, done.stdout)
 
 
