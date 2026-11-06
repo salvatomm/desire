@@ -316,7 +316,9 @@ class Runs(unittest.TestCase):
 
     def test_a_wrong_author_stops(self):
         self.both_add_to_the_changelog()
-        with unittest.mock.patch.dict("os.environ", {"GIT_AUTHOR_NAME": "someone"}):
+        with unittest.mock.patch.dict("os.environ", {
+                "GIT_AUTHOR_NAME": "someone", "GIT_AUTHOR_EMAIL": "bot@example.test",
+                "GIT_COMMITTER_NAME": "bot", "GIT_COMMITTER_EMAIL": "bot@example.test"}):
             code, out = self.remerge()
         self.assertEqual(code, 2)
         self.assertIn("git authors as someone <bot@example.test>", out)
