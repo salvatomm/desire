@@ -98,7 +98,11 @@ def agent_footer(body, setup):
 
 
 def last_comment(thread):
-    """(resolved, login, body, url) of a GraphQL or MCP review thread."""
+    """(resolved, login, body, url) of a REST, GraphQL or MCP review thread."""
+    if "last" in thread:
+        last = thread["last"] or {}
+        return (thread["resolved"], (last.get("user") or {}).get("login", ""),
+                last.get("body", ""), last.get("html_url", ""))
     if "is_resolved" in thread:
         last = (thread["comments"] or [{}])[-1]
         return (thread["is_resolved"], last.get("author", ""),
@@ -233,6 +237,21 @@ def expected(repo, base):
 
 
 def threads(repo, number):
+    """Every review thread of the pull request, from the REST thread route
+    where the session serves one, else from GraphQL."""
+    try:
+        listed = request(f"{API}/repos/{repo}/pulls/{number}/ccr/review_threads")
+    except Unread:
+        listed = None
+    if isinstance(listed, list):
+        comments = {c["id"]: c for c in get(repo, f"pulls/{number}/comments") or []}
+        return [{"resolved": t.get("resolved", False),
+                 "last": comments.get((t.get("comment_ids") or [None])[-1])}
+                for t in listed]
+    return graphql_threads(repo, number)
+
+
+def graphql_threads(repo, number):
     """Every review thread of the pull request, via GraphQL."""
     owner, name = repo.split("/")
     nodes, cursor = [], None

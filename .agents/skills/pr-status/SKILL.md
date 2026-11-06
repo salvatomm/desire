@@ -31,7 +31,8 @@ The rules it measures are [Reading CI](../../../OPERATIONS.md#reading-ci) and
 
 ## When the token cannot read
 
-Review threads come from GraphQL. Where GraphQL or a repo is not readable, the field prints `n/a`
+Review threads come from the REST route `pulls/N/ccr/review_threads` where the session serves one,
+else from GraphQL. Where neither, or the repo, is readable, the field prints `n/a`
 and the verdict is `incomplete` unless something already waits on an agent. Read the same data
 through the MCP tools instead, with `mcp__github__pull_request_read` on the pull request:
 

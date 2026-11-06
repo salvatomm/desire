@@ -209,13 +209,37 @@ class GraphQL(unittest.TestCase):
                       self.page([thread("b")], False)])
         with mock.patch.object(pr_status, "request",
                                lambda *_: next(pages)):
-            self.assertEqual(len(pr_status.threads("o/r", 1)), 2)
+            self.assertEqual(len(pr_status.graphql_threads("o/r", 1)), 2)
 
     def test_an_error_answer_is_unread(self):
         with mock.patch.object(pr_status, "request",
                                lambda *_: {"message": "not available"}):
             with self.assertRaises(pr_status.Unread):
-                pr_status.threads("o/r", 1)
+                pr_status.graphql_threads("o/r", 1)
+
+
+class RestThreads(unittest.TestCase):
+
+    def answer(self, url, data=None):
+        if url.endswith("/ccr/review_threads"):
+            return [{"resolved": False, "comment_ids": [1, 2]},
+                    {"resolved": True, "comment_ids": [3]}]
+        return [{"id": 1, "user": {"login": "rev"}, "body": "fix", "html_url": "u1"},
+                {"id": 2, "user": {"login": "human-agents"}, "body": "done", "html_url": "u2"},
+                {"id": 3, "user": {"login": "rev"}, "body": "x", "html_url": "u3"}]
+
+    def test_the_last_comment_decides(self):
+        with mock.patch.object(pr_status, "request", self.answer):
+            found = pr_status.threads("o/r", 1)
+        self.assertEqual(pr_status.split_threads(found, SETUP), ([], ["u2"]))
+
+    def test_no_route_falls_back_to_graphql(self):
+        def answer(url, data=None):
+            if url.endswith("/ccr/review_threads"):
+                raise pr_status.Unread("HTTP 403")
+            return GraphQL.page(None, [thread("a")], False)
+        with mock.patch.object(pr_status, "request", answer):
+            self.assertEqual(len(pr_status.threads("o/r", 1)), 1)
 
 
 class Todo(unittest.TestCase):
