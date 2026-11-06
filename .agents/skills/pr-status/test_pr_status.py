@@ -233,6 +233,24 @@ class RestThreads(unittest.TestCase):
             found = pr_status.threads("o/r", 1)
         self.assertEqual(pr_status.split_threads(found, SETUP), ([], ["u2"]))
 
+    def test_an_unlisted_last_comment_is_unread(self):
+        def answer(url, data=None):
+            if url.endswith("/ccr/review_threads"):
+                return [{"resolved": False, "comment_ids": [9]}]
+            return [] if "/comments" in url else None
+        with mock.patch.object(pr_status, "request", answer):
+            with self.assertRaises(pr_status.Unread):
+                pr_status.threads("o/r", 1)
+
+    def test_an_unreadable_comment_listing_is_unread(self):
+        def answer(url, data=None):
+            if url.endswith("/ccr/review_threads"):
+                return [{"resolved": False, "comment_ids": [1]}]
+            return None
+        with mock.patch.object(pr_status, "request", answer):
+            with self.assertRaises(pr_status.Unread):
+                pr_status.threads("o/r", 1)
+
     def test_no_route_falls_back_to_graphql(self):
         def answer(url, data=None):
             if url.endswith("/ccr/review_threads"):

@@ -244,10 +244,15 @@ def threads(repo, number):
     except Unread:
         listed = None
     if isinstance(listed, list):
-        comments = {c["id"]: c for c in get(repo, f"pulls/{number}/comments") or []}
-        return [{"resolved": t.get("resolved", False),
-                 "last": comments.get((t.get("comment_ids") or [None])[-1])}
-                for t in listed]
+        listing = get(repo, f"pulls/{number}/comments")
+        if listing is None:
+            raise Unread("HTTP 404")
+        comments = {c["id"]: c for c in listing}
+        last = [(t.get("comment_ids") or [None])[-1] for t in listed]
+        if any(i not in comments for i in last):
+            raise Unread("a thread's last comment is not listed")
+        return [{"resolved": t.get("resolved", False), "last": comments[i]}
+                for t, i in zip(listed, last)]
     return graphql_threads(repo, number)
 
 
