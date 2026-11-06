@@ -5,7 +5,7 @@ Entries state the changes, no explanation of why.
 
 ## 2026-11-05
 
-**Five skills for what the turns kept doing by hand** (`.agents/skills/`, `.claude/skills/`,
+**Five skills** (`.agents/skills/`, `.claude/skills/`,
 `.github/workflows/lint.yml`) — `pr-status` measures a pull request live and gives one verdict;
 `remerge` merges a target branch into a pull request's branch locally, never pushing;
 `post-check` lints a draft before it is posted; `work-notes` lists the items a turn touched with no
