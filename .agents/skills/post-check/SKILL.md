@@ -19,8 +19,8 @@ python3 <DESIRE_REPO clone>/.agents/skills/post-check/post_check.py draft.md --t
 What it finds:
 
 - **Closing keywords** (`close`, `fix`, `resolve` and their forms), outside code: a keyword
-  followed by several references (`Closes #1, #2`), a reference on the next line, and
-  `Closes name#N` without the owner. Write `Closes #1` and `Closes #2`. The rule is in
+  followed by several references (`Closes #1, #2`), a reference on the next line, a noun
+  before it (`Closes issue #1`), and `Closes name#N` without the owner. Write `Closes #1` and `Closes #2`. The rule is in
   [Issues and reviews](../../../OPERATIONS.md#issues-and-reviews).
 - **Footer**: the last non-empty line carries exactly one AGENT_FOOTERS marker, read as
   [Matching an attribution footer](../../../OPERATIONS.md#matching-an-attribution-footer) says;
@@ -41,7 +41,8 @@ Gotchas:
 - A repo that prints `unreadable (HTTP 403), so private` may only be out of this session's reach.
   Check its visibility with the GitHub MCP tools; if it is public, pass `--public owner/repo` and
   run again. Never pass it for a repo you did not check.
-- An unreadable target is treated as public, so every check still runs.
+- An unreadable target prints `unreadable`, not `n/a`: it is treated as public, so every check
+  still runs and the result can be clean.
 - A repo named only in words ("the docs") is not caught.
 
 ## After posting
@@ -51,7 +52,8 @@ python3 .../post_check.py draft.md --target owner/repo --verify-closes owner/rep
 ```
 
 This compares the issues the body's keywords close with the pull request's GraphQL
-`closingIssuesReferences`, both ways. Where GraphQL is not readable it prints `n/a` and exits 2:
+`closingIssuesReferences`, both ways. Where GraphQL is not readable, or the pull request links
+more than the 100 it reads, it prints `n/a` and exits 2:
 then read each issue the body closes with the GitHub MCP `issue_read` (`get`) and check its
 `closed_by_pull_requests` names the pull request. Fix a mismatch by editing the body, then run
 the check again.

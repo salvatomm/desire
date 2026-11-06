@@ -20,19 +20,21 @@ python3 <DESIRE_REPO clone>/.agents/skills/remerge/remerge.py <worktree> <base> 
 ```
 
 Run from the MEMORY_REPO clone, or pass `--config <path to config.env>` (or set `AGENTS_CONFIG`):
-a real run refuses to commit unless git's identity is AGENT and AGENT_EMAIL.
+a real run refuses to commit unless git's committer and author are AGENT and AGENT_EMAIL.
 
 What it does, in order:
 1. Unshallows the clone and fetches `origin/<base>` and `origin/<branch>`; stops on uncommitted
-   changes or when `origin/<branch>` has commits the worktree lacks.
+   changes to tracked files or when `origin/<branch>` has commits the worktree lacks. Untracked
+   files stay, and `--check` sees them.
 2. Prints `up to date` when the branch already contains the base.
 3. `--dry-run` merges in memory (`git merge-tree`), reports what a real run would meet and
    writes nothing.
 4. A real run is `git merge --no-ff --no-commit`. A conflict in `CHANGELOG.md` alone resolves to
    the base's file plus the blocks the branch added since the merge base, each placed after the
    line it followed; a block the base already has is dropped. Any other conflict aborts.
-5. Lists every line in the merged tree that still imports or uses a module or a top-level name
-   the base deleted or renamed since the merge base.
+5. Lists every line of the merged tree's `.py`, `.ipynb` and Markdown files that still imports or
+   uses a Python module or a top-level name the base deleted or renamed since the merge base;
+   other files, such as config or docs sources, are not searched.
 6. Aborts if any file's own change on the branch was lost or grew in the merged tree; a change
    the base already made the same way does not count.
 7. Runs `--check` in the worktree, aborts if it fails, then commits `Merge <base> into <branch>`,
@@ -40,7 +42,8 @@ What it does, in order:
 
 Exit codes: 0 merged or up to date, 1 stale names to fix (dry run: also conflicts), 2 stopped
 or unreadable, 3 a change lost or grown, 4 the check failed. Exit 1 on a real run has committed;
-every other stop aborts the merge and leaves the branch as it was.
+every other stop aborts the merge and leaves the branch as it was. A re-fetch of the base that
+fails after the commit is printed, not a stop.
 
 Gotchas:
 - It never pushes. Push with `git push origin HEAD` only after fixing what step 5 lists and

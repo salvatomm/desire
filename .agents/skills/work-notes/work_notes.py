@@ -9,6 +9,7 @@ Run from the MEMORY_REPO clone, on the day PR's branch. Exit 0 clean, 1 with
 findings, 2 when GitHub could not be read.
 """
 import argparse
+import datetime
 import json
 import os
 import pathlib
@@ -22,6 +23,7 @@ import urllib.request
 TEMPLATE = (pathlib.Path(__file__).resolve().parents[3]
             / "template" / "memory" / "WORK" / "TEMPLATE.md")
 LOG_LINES = 5
+TIMEOUT = 30
 DAY = re.compile(r"\d{4}-\d{2}-\d{2}")
 SINCE = re.compile(r"\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}(:\d{2})?(Z|[+-]\d{2}:\d{2})?)?")
 ITEM = re.compile(r"^- \*\*(.+?)\*\*")
@@ -64,14 +66,14 @@ def config_path(given):
 
 def rate_wait(code, headers, body, now):
     """Seconds to wait before retrying a rate-limited answer, None if it is not one."""
-    if code not in (403, 429) or "rate limit" not in body.lower():
+    if code not in (403, 429):
         return None
     if headers.get("Retry-After", "").isdigit():
         return min(int(headers["Retry-After"]) + 1, 90)
     reset = headers.get("X-RateLimit-Reset", "")
     if headers.get("X-RateLimit-Remaining") == "0" and reset.isdigit():
         return min(max(int(reset) - now, 1), 90)
-    return 60
+    return 60 if "rate limit" in body.lower() else None
 
 
 def request(url, attempts=3):
@@ -82,7 +84,8 @@ def request(url, attempts=3):
         headers["Authorization"] = f"Bearer {token}"
     for attempt in range(attempts):
         try:
-            with urllib.request.urlopen(urllib.request.Request(url, headers=headers)) as r:
+            with urllib.request.urlopen(urllib.request.Request(url, headers=headers),
+                                        timeout=TIMEOUT) as r:
                 return json.load(r)
         except urllib.error.HTTPError as error:
             wait = rate_wait(error.code, error.headers,
@@ -123,6 +126,15 @@ def day_pr(repo, item, setup):
             and bool(DAY_TITLE.match(item["title"].strip())))
 
 
+def is_day(text):
+    """Whether `text` is a calendar date YYYY-MM-DD."""
+    try:
+        datetime.date.fromisoformat(text)
+    except ValueError:
+        return False
+    return True
+
+
 def parse(text):
     """A note as its title, its fields [(label, text)] and its log [(day, text)]."""
     lines = text.splitlines()
@@ -142,6 +154,15 @@ def parse(text):
         elif not line.strip() or line.startswith("- "):
             current = None
     return title, [tuple(f) for f in fields], [tuple(e) for e in log]
+
+
+def fields_after_log(text):
+    """The field labels that come below the note's first log line."""
+    labels = [match.group(1) for match in map(ITEM.match, text.splitlines()[1:])
+              if match]
+    first = next((i for i, label in enumerate(labels) if DAY.match(label)),
+                 len(labels))
+    return [label for label in labels[first:] if not DAY.match(label)]
 
 
 def template_fields(text):
@@ -181,6 +202,8 @@ def lint_note(repo, number, text, fields):
     days = [day for day, _ in log]
     if days != sorted(days, reverse=True):
         findings.append("log not newest-first")
+    findings += [f"{day} is not a date" for day in days if not is_day(day)]
+    findings += [f"{label} after the log" for label in fields_after_log(text)]
     for where, line, in_log in ([(label, line, False) for label, line in got
                                  if label in fields]
                                 + [(day, line, True) for day, line in log]):
@@ -210,7 +233,7 @@ def touched_finding(item, text, since_day):
         return None if closed else "no note"
     if closed:
         return "closed, note not deleted"
-    if not any(day >= since_day for day, _ in parse(text)[2]):
+    if not any(is_day(day) and day >= since_day for day, _ in parse(text)[2]):
         return f"no log line dated {since_day} or later"
     return None
 
@@ -243,7 +266,7 @@ def touched(root, setup, since):
             if finding:
                 findings.append(f"{repo}#{item['number']}: {finding} "
                                 f"(WORK/{path.parent.name}/{path.name})")
-    print("\n".join(findings) or "clean")
+    print("\n".join(findings) or ("incomplete" if incomplete else "clean"))
     print("\nDay-PR comment:")
     print("\n".join(skeleton(rows)) or "(nothing touched)")
     return 2 if incomplete else 1 if findings else 0

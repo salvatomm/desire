@@ -25,8 +25,10 @@ BULLET = re.compile(r"^\s*(?:[-*+]|\d+[.)])?\s*")
 FOOTER_LINK = re.compile(r"\[[^\]]*\]\((https://[^\s)]+)\)")
 LIST = re.compile(r"[\s,;]*(?:(?:and|or|&|\+)\s+)?" + REF.pattern)
 TARGET = re.compile(r"^([\w.-]+/[\w.-]+)#(\d+)$")
+NOUN = re.compile(r"[:\s]*(?:issues?|prs?|pull requests?|bugs?)\s+", re.I)
+FENCE = re.compile(r"\s*(`{3,}|~{3,})(.*)")
 CLOSING = """query($o:String!,$r:String!,$n:Int!){repository(owner:$o,name:$r){
-pullRequest(number:$n){closingIssuesReferences(first:100){nodes{number
+pullRequest(number:$n){closingIssuesReferences(first:100){totalCount nodes{number
 repository{nameWithOwner}}}}}}"""
 
 
@@ -78,13 +80,18 @@ def is_public(repo):
 
 def prose(text):
     """`text` with fenced and inline code blanked, line numbers kept."""
-    lines, fenced = [], False
+    lines, fence = [], ""
     for line in text.splitlines():
-        if line.lstrip().startswith(("```", "~~~")):
-            fenced = not fenced
+        run = FENCE.match(line)
+        if run and not fence:
+            fence = run[1]
+        elif run and run[1][0] == fence[0] and len(run[1]) >= len(fence) \
+                and not run[2].strip():
+            fence = ""
+        if run or fence:
             lines.append("")
             continue
-        lines.append("" if fenced else re.sub(
+        lines.append(re.sub(
             r"`[^`]*`", lambda m: " " * len(m[0]), line))
     return lines
 
@@ -106,6 +113,12 @@ def closes(lines, default):
         for word in KEYWORD.finditer(line):
             rest = line[word.end():]
             ref = REF.match(rest, re.match(r"[:\s]*", rest).end())
+            if not ref and (noun := NOUN.match(rest)) and REF.match(
+                    rest, noun.end()):
+                findings.append(f"closes: line {at}: '{word[0]}' is followed by "
+                                f"'{noun[0].strip(': ')}', not a reference; "
+                                "GitHub links none")
+                continue
             if not ref:
                 if REF.search(rest) or rest.strip()[-1:] not in ("", ":"):
                     continue
@@ -240,8 +253,10 @@ def closing_refs(target):
         "o": owner, "r": name, "n": int(match[2])}}).encode())
     if body.get("errors") or not (body.get("data") or {}).get("repository"):
         raise Unread("GraphQL")
-    nodes = body["data"]["repository"]["pullRequest"][
-        "closingIssuesReferences"]["nodes"]
+    refs = body["data"]["repository"]["pullRequest"]["closingIssuesReferences"]
+    nodes = refs["nodes"]
+    if refs["totalCount"] > len(nodes):
+        raise Unread(f"{refs['totalCount']} closing references, read {len(nodes)}")
     return {f"{n['repository']['nameWithOwner']}#{n['number']}".lower()
             for n in nodes}
 
@@ -259,7 +274,7 @@ def public_scan(args, setup, lines, entries):
     """(findings, complete) for private repos and denylist hits, code included."""
     try:
         patterns = denylist(args.denylist) if args.denylist else []
-    except (OSError, re.error) as error:
+    except (OSError, UnicodeError, re.error) as error:
         print(f"denylist: n/a ({error})")
         return [], False
     texts = [lines] + [entry[4].splitlines() for entry in entries]
@@ -293,7 +308,8 @@ def check(args, setup, text):
         print("footer: n/a (AGENT_FOOTERS is empty)")
     public = True if args.target in args.public else is_public(args.target)
     shown = {True: "public", False: "private"}.get(public)
-    print(f"target: {args.target} {shown or f'n/a ({public}), treated as public'}")
+    print(f"target: {args.target} "
+          f"{shown or f'unreadable ({public}), treated as public'}")
     entries = []
     if args.range:
         try:

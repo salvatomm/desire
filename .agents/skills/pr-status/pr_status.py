@@ -217,10 +217,13 @@ def mergeable(repo, number, wait):
 def expected(repo, base):
     """Required check names from branch protection and rulesets on `base`,
     none when it is unprotected."""
-    branch = get(repo, f"branches/{base}") or {}
+    branch = get(repo, f"branches/{base}")
+    if branch is None:
+        raise Unread("HTTP 404")
     if not branch.get("protected"):
         return []
-    required = (branch.get("protection") or {}).get("required_status_checks", {})
+    required = (branch.get("protection") or {}).get(
+        "required_status_checks") or {}
     names = set(required.get("contexts") or [])
     for rule in get(repo, f"rules/branches/{base}") or []:
         if rule.get("type") == "required_status_checks":
@@ -268,7 +271,7 @@ def measure(repo, number, setup, now, given=None, wait=time.sleep):
         diff["behind_by"], diff["ahead_by"])
     body = attempt(get, repo, f"contents/TODO.md?ref={sha}")
     s["todo"] = body if body in ("n/a", None) else todo_counts(
-        base64.b64decode(body["content"]).decode())
+        base64.b64decode(body["content"]).decode(errors="replace"))
     raw = given if given is not None else attempt(threads, repo, number)
     s["threads"] = raw if raw == "n/a" else split_threads(raw, setup)
     reviews = attempt(get, repo, f"pulls/{number}/reviews")
@@ -387,8 +390,10 @@ def main(arguments):
     args = parser.parse_args(arguments)
     matches = [TARGET.match(t) for t in args.targets]
     if not all(matches) or not (matches or args.cited) or (
-            args.threads and len(matches) != 1):
-        parser.error("targets are owner/repo#N, one with --threads")
+            args.threads and len(matches) != 1) or (
+            args.cited and not args.repo):
+        parser.error("targets are owner/repo#N, one with --threads; "
+                     "--cited needs --repo")
     try:
         setup, given = config(args.config), None
         missing = {"USER", "AGENT"} - set(setup)

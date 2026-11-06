@@ -54,7 +54,7 @@ Decide in this order, first match wins:
 | draft; `dirty` or `behind`; a check failed; a check queued, running, or expected and never created; `TODO.md` present; an unresolved thread whose last comment is not the agent's | waiting-on-agent |
 | any field unread, or `mergeable_state` still `unknown` | incomplete |
 | an unresolved thread whose last comment is the agent's | waiting-on-USER |
-| no USER approval on this exact head SHA, or `mergeable_state` not `clean` | ready |
+| no USER approval on this exact head SHA, or `mergeable_state` neither `clean` nor `has_hooks` | ready |
 | otherwise | GO |
 
 A comment is the agent's when AGENT wrote it, or USER's account did and its last line carries an

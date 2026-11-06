@@ -238,15 +238,16 @@ def changelog_text(repo, mb, base):
 
 
 def identity(repo, path):
-    """Stop unless git commits as config.env's AGENT and AGENT_EMAIL."""
+    """Stop unless git commits and authors as config.env's AGENT and AGENT_EMAIL."""
     try:
         setup = config(path)
         want = f"{setup['AGENT']} <{setup['AGENT_EMAIL']}>"
     except (OSError, ValueError, KeyError) as error:
         raise Stop(f"config.env: n/a ({error})") from error
-    ident = git(repo, "var", "GIT_COMMITTER_IDENT").rsplit(" ", 2)[0]
-    if ident != want:
-        raise Stop(f"git commits as {ident}, config.env says {want}")
+    for role, verb in (("COMMITTER", "commits"), ("AUTHOR", "authors")):
+        ident = git(repo, "var", f"GIT_{role}_IDENT").rsplit(" ", 2)[0]
+        if ident != want:
+            raise Stop(f"git {verb} as {ident}, config.env says {want}")
 
 
 def prepare(repo, base):
@@ -311,9 +312,12 @@ def merge(repo, branch, remote, mb, head, arguments):
         raise
     print(f"merged: {note or 'no conflict'}", *(f"stale: {hit}" for hit in hits), sep="\n")
     print(f"old {head}\nnew {git(repo, 'rev-parse', 'HEAD').strip()}")
-    fetch(repo, arguments.base)
-    if not ancestor(repo, remote):
-        print(f"{remote} moved again: run this again before pushing")
+    try:
+        fetch(repo, arguments.base)
+        if not ancestor(repo, remote):
+            print(f"{remote} moved again: run this again before pushing")
+    except Stop as stop:
+        print(f"could not check whether {remote} moved again: {stop}")
     print("push with: git push origin HEAD\na push voids an approval given on the old"
           " SHA, and a review bot may not re-review a push that only merges the base")
     return 1 if hits else 0

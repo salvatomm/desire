@@ -115,6 +115,14 @@ class Lint(unittest.TestCase):
         text = GOOD + "- **2026-09-02 🐦 Birdsong** later, below\n"
         self.assertEqual(self.lint(text), ["log not newest-first"])
 
+    def test_a_field_after_the_log(self):
+        text = GOOD.replace("- **blocks** nothing\n", "") + "- **blocks** nothing\n"
+        self.assertEqual(self.lint(text), ["blocks after the log"])
+
+    def test_a_log_date_that_is_no_date(self):
+        text = GOOD.replace("2026-09-01 🌙", "2026-19-01 🌙")
+        self.assertIn("2026-19-01 is not a date", self.lint(text))
+
     def test_live_state_in_a_field(self):
         for line, kinds in [("CI green on `869fdf1`", ["CI result"]),
                             ("checks green", ["CI result"]),
@@ -177,6 +185,11 @@ class Touched(unittest.TestCase):
         self.assertEqual(work_notes.touched_finding(item(1), GOOD, "2026-09-02"),
                          "no log line dated 2026-09-02 or later")
 
+    def test_a_log_date_that_is_no_date_is_not_a_line_since(self):
+        text = GOOD.replace("2026-09-01 🌙", "9999-99-99 🌙")
+        self.assertEqual(work_notes.touched_finding(item(1), text, "2026-09-02"),
+                         "no log line dated 2026-09-02 or later")
+
     def test_note_path_uses_the_repository_name(self):
         self.assertEqual(work_notes.note_path(pathlib.Path("/m"), "org/lib", 7),
                          pathlib.Path("/m/WORK/lib/7.md"))
@@ -213,6 +226,8 @@ class Touched(unittest.TestCase):
         code, out = self.run_touched(search)
         self.assertEqual(code, 2)
         self.assertIn("org/docs: n/a (403)", out)
+        self.assertNotIn("clean", out)
+        self.assertIn("incomplete", out)
 
     def test_findings_and_skeleton(self):
         def search(agent, repo, since):
@@ -270,6 +285,17 @@ class Main(unittest.TestCase):
                 work_notes.main(["touched", "--since", since])
 
 
+class Request(unittest.TestCase):
+    """A GitHub read gives up on a stalled connection."""
+
+    def test_a_timeout_is_passed(self):
+        with mock.patch.object(work_notes.urllib.request, "urlopen",
+                               side_effect=TimeoutError) as urlopen, \
+                self.assertRaises(OSError):
+            work_notes.request("https://example.invalid")
+        self.assertEqual(urlopen.call_args.kwargs.get("timeout"), work_notes.TIMEOUT)
+
+
 class RateLimit(unittest.TestCase):
     """A rate-limited answer is waited out, anything else is not."""
 
@@ -281,6 +307,11 @@ class RateLimit(unittest.TestCase):
         self.assertEqual(work_notes.rate_wait(
             403, {"X-RateLimit-Remaining": "0", "X-RateLimit-Reset": "30"},
             "API rate limit exceeded", 0), 30)
+
+    def test_headers_alone_signal_a_rate_limit(self):
+        self.assertEqual(work_notes.rate_wait(429, {"Retry-After": "5"}, "", 0), 6)
+        self.assertEqual(work_notes.rate_wait(
+            403, {"X-RateLimit-Remaining": "0", "X-RateLimit-Reset": "30"}, "", 0), 30)
 
     def test_forbidden_is_not_a_rate_limit(self):
         self.assertIsNone(work_notes.rate_wait(403, {}, "Resource not accessible", 0))

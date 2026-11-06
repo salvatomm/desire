@@ -11,6 +11,7 @@ import re
 import subprocess
 import tempfile
 import unittest
+import unittest.mock
 
 import remerge
 
@@ -312,6 +313,31 @@ class Runs(unittest.TestCase):
         code, out = self.remerge()
         self.assertEqual(code, 2)
         self.assertIn("config.env says someone <else@example.test>", out)
+
+    def test_a_wrong_author_stops(self):
+        self.both_add_to_the_changelog()
+        with unittest.mock.patch.dict("os.environ", {"GIT_AUTHOR_NAME": "someone"}):
+            code, out = self.remerge()
+        self.assertEqual(code, 2)
+        self.assertIn("git authors as someone <bot@example.test>", out)
+
+    def test_a_failed_refetch_after_the_commit_still_reports_the_merge(self):
+        self.both_add_to_the_changelog()
+        old = run(self.clone, "rev-parse", "HEAD")
+        real = remerge.fetch
+        calls = []
+
+        def fetch(repo, branch):
+            calls.append(branch)
+            if len(calls) > 2:
+                raise remerge.Stop("git fetch: n/a (exit 128) offline")
+            real(repo, branch)
+
+        with unittest.mock.patch.object(remerge, "fetch", fetch):
+            code, out = self.remerge()
+        self.assertEqual(code, 0, out)
+        self.assertNotEqual(run(self.clone, "rev-parse", "HEAD"), old)
+        self.assertIn("could not check whether origin/main moved again", out)
 
     def test_a_shallow_clone_is_completed(self):
         self.write(self.origin, {"pkg/other.py": "y = 2\n"}, "theirs")

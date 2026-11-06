@@ -160,6 +160,17 @@ class Measure(unittest.TestCase):
         self.assertEqual((s["verdict"], paths), ("merged", ["pulls/1"]))
         self.assertTrue(pr_status.line(s).endswith("merged by human"))
 
+    def test_a_todo_that_is_not_utf8_is_still_counted(self):
+        pull = {"state": "open", "draft": False, "mergeable_state": "clean",
+                "head": {"sha": SHA}, "base": {"ref": "main"}}
+        todo = {"content": pr_status.base64.b64encode(b"\xff [ ] a").decode()}
+
+        def answer(repo, path, key=None):
+            return {"pulls/1": pull, "contents/TODO.md?ref=" + SHA: todo}.get(path)
+        with mock.patch.object(pr_status, "get", answer):
+            s = pr_status.measure("o/r", 1, SETUP, NOW, given=[], wait=None)
+        self.assertEqual(s["todo"]["open"], 1)
+
 
 class Main(unittest.TestCase):
 
@@ -174,6 +185,16 @@ class Main(unittest.TestCase):
                         self.assertRaises(SystemExit) as stop:
                     pr_status.main(arguments)
                 self.assertEqual(stop.exception.code, 2)
+
+    def test_cited_without_repo_is_a_usage_error(self):
+        with tempfile.TemporaryDirectory() as root:
+            path = pathlib.Path(root) / "config.env"
+            path.write_text("USER=human\nAGENT=human-agents\n")
+            with mock.patch("sys.stderr"), mock.patch.object(
+                    pr_status, "cited", return_value=True), \
+                    self.assertRaises(SystemExit) as stop:
+                pr_status.main(["--config", str(path), "--cited", str(path)])
+        self.assertEqual(stop.exception.code, 2)
 
 
 class GraphQL(unittest.TestCase):
@@ -337,6 +358,18 @@ class Expected(unittest.TestCase):
         with mock.patch.object(pr_status, "get", self.answers(table)):
             self.assertEqual(pr_status.expected("o/r", "main"),
                              ["build", "lint"])
+
+    def test_null_required_checks_read_as_none(self):
+        table = {"branches/main": {"protected": True, "protection": {
+            "required_status_checks": None}}, "rules/branches/main": []}
+        with mock.patch.object(pr_status, "get", self.answers(table)):
+            self.assertEqual(pr_status.expected("o/r", "main"), [])
+
+    def test_an_unreadable_base_is_unread(self):
+        table = {"branches/main": None}
+        with mock.patch.object(pr_status, "get", self.answers(table)), \
+                self.assertRaises(pr_status.Unread):
+            pr_status.expected("o/r", "main")
 
 
 class Cited(unittest.TestCase):
