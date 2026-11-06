@@ -104,6 +104,15 @@ class Parse(unittest.TestCase):
         self.assertEqual(rules_diff.removed_names(changes), {"a.py": {"cited("}})
         self.assertFalse(rules_diff.identifier("blocked"))
 
+    def test_a_class_is_its_bare_name(self):
+        changes = [("a.py", "-", 0, "class Unread(Exception):")]
+        self.assertEqual(rules_diff.removed_names(changes), {"a.py": {"Unread"}})
+
+    def test_the_changelog_does_not_keep_a_name(self):
+        changes = [("AGENTS.md", "-", 3, "Run `old_name` first."),
+                   ("CHANGELOG.md", "+", 5, "**Rule** — `old_name` is gone.")]
+        self.assertEqual(rules_diff.removed_names(changes)["AGENTS.md"], {"old_name"})
+
 
 class Changelog(unittest.TestCase):
     """Reasons outside quotes, and an entry under today's top heading."""
@@ -121,6 +130,8 @@ class Changelog(unittest.TestCase):
         good = [("CHANGELOG.md", "+", 5, "**Rule** (`AGENTS.md`) — x.")]
         self.assertEqual(rules_diff.entry(good, text, "2026-11-05"), [])
         self.assertEqual(len(rules_diff.entry(good, text, "2026-11-06")), 1)
+        early = [("CHANGELOG.md", "+", 2, "**Rule** — x.")]
+        self.assertEqual(len(rules_diff.entry(early, text, "2026-11-05")), 1)
         late = [("CHANGELOG.md", "+", 8, "plain line")]
         self.assertEqual(len(rules_diff.entry(late, text, "2026-11-05")), 2)
         self.assertEqual(rules_diff.entry([("AGENTS.md", "+", 1, "x")], "", "d"),
@@ -180,6 +191,17 @@ class Run(unittest.TestCase):
         code, out = self.run_main("nosuch")
         self.assertEqual(code, 2)
         self.assertTrue(out.startswith("n/a"))
+
+    def test_a_deleted_file_leaves_its_names(self):
+        root = pathlib.Path(self.folder)
+        (root / "tool.py").write_text("def helper():\n    pass\n")
+        (root / "README.md").write_text("Call `helper()`.\n")
+        self.git("-c", "user.name=t", "-c", "user.email=t@t", "add", ".")
+        self.git("-c", "user.name=t", "-c", "user.email=t@t", "commit", "-qm", "tool")
+        self.git("rm", "-q", "tool.py")
+        self.git("-c", "user.name=t", "-c", "user.email=t@t", "commit", "-qm", "drop")
+        code, out = self.run_main("main~1")
+        self.assertIn("`helper` left a file and is still in README.md", out)
 
     def test_allow(self):
         code, out = self.run_main("main~1", "--allow", "widgets")

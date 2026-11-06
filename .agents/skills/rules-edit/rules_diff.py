@@ -22,7 +22,7 @@ CAUSAL = re.compile(r"\b(because|so that|to avoid|which is why|in order to)\b"
 QUOTE = re.compile(r"\*\"[^\"]*\"\*|\*\"[^\"]*$|^[^\"]*\"\*")
 CLAUSE = re.compile(r"\b(only|every|never|unless|once)\b", re.I)
 TICKED = re.compile(r"`([A-Za-z_][\w./-]{2,})`")
-DEF = re.compile(r"^\s*(?:def|class)\s+(\w+)")
+DEF = re.compile(r"^\s*(?:def\s+(\w+)|class\s+(\w+))")
 COMMENTED = (".py", ".sh", ".yml", ".yaml")
 NEW = re.compile(r"\b(never|rather than|instead of|no longer)\b", re.I)
 HEADING = re.compile(r"^## (\d{4}-\d{2}-\d{2})\s*$")
@@ -190,12 +190,12 @@ def identifier(name):
 def named(text):
     """The backticked names and the def or class a line carries."""
     names = {n for n in TICKED.findall(text) if identifier(n)}
-    return names | {m.group(1) + "(" for m in [DEF.match(text)] if m}
+    return names | {m.group(2) or m.group(1) + "(" for m in [DEF.match(text)] if m}
 
 
 def removed_names(changes):
     """Per file, the names its removed lines carry that no added line does."""
-    added = set().union(*[named(t) for _, s, _, t in changes if s == "+"])
+    added = set().union(*[named(t) for p, s, _, t in changes if s == "+" and p != CHANGELOG])
     found = {}
     for path, sign, _, text in changes:
         if sign == "-":
@@ -203,9 +203,9 @@ def removed_names(changes):
     return found
 
 
-def survivors(repo, head, removed, texts, deleted):
+def survivors(repo, head, removed, texts):
     """Each name a file no longer carries at the head that other files still do."""
-    gone = sorted({n for path, names in removed.items() if path not in deleted
+    gone = sorted({n for path, names in removed.items()
                    for n in names if not word(n).search(texts.get(path, ""))})
     for name in gone:
         found = git(repo, "grep", "-cF", name, head, "--", ".", f":!{CHANGELOG}", ok=(0, 1))
@@ -225,8 +225,9 @@ def entry(changes, text, day):
     notes = []
     if not tops or HEADING.match(lines[tops[0] - 1]).group(1) != day:
         notes.append(f"CHANGELOG.md's top heading is not ## {day}")
-    if len(tops) > 1 and any(n > tops[1] for n, _ in added):
-        notes.append("CHANGELOG.md gained lines below its top dated section")
+    end = tops[1] if len(tops) > 1 else len(lines) + 1
+    if tops and any(not tops[0] <= n < end for n, _ in added):
+        notes.append("CHANGELOG.md gained lines outside its top dated section")
     if not any(t.startswith("**") for _, t in added):
         notes.append("CHANGELOG.md gained no line starting with a bold rule")
     return notes
@@ -263,7 +264,7 @@ def check(repo, base, head, setup, allow):
                      list(dropped(changes, sentences(rules), deleted)))
     failed = False
     try:
-        advice += report("old names", list(survivors(repo, head, removed_names(changes), texts, deleted)))
+        advice += report("old names", list(survivors(repo, head, removed_names(changes), texts)))
         day = git(repo, "log", "-1", "--format=%cs", head).strip()
         advice += report("changelog entry", entry(changes, texts.get(CHANGELOG, ""), day))
     except Unread as error:

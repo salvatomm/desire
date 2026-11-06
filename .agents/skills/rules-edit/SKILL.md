@@ -37,7 +37,7 @@ a rules PR to one round.
 6. **Check, before every push**, from the MEMORY_REPO clone so `config.env` is found:
 
    ```shell
-   python3 <DESIRE_REPO clone>/.github/lint.py
+   python3 <DESIRE_REPO clone>/.github/lint.py --memory .
    python3 <DESIRE_REPO clone>/.agents/skills/rules-edit/rules_diff.py origin/main \
        --repo <DESIRE_REPO clone>
    ```
@@ -52,7 +52,7 @@ a rules PR to one round.
    - **Advisories**, each to read, not to obey: a reason word in an added changelog line; a new
      comment in `.py`, `.sh` or `.yml`; a new `never`/`instead of` clause, to hold against USER's
      quote; a removed `only`/`every`/`never`/`unless`/`once` clause no sentence on the branch still
-     says; a backticked name or `def` that left a file and is still used elsewhere; a changelog
+     says; a backticked name, `def` or `class` that left a file and is still used elsewhere; a changelog
      entry missing, not at the top, or not under the date of the last commit.
 7. **Merge `main` in before asking for approval**, and again whenever another rules PR lands
    first. Re-run step 6 on the merge.
