@@ -14,6 +14,15 @@ check for installation values. CI runs each skill's tests. USER: *"look at all o
 interactions in memory and desire repos then open a new desire PR with skills that would speed up
 and improve our future work"*.
 
+**The brief skill** (`.agents/skills/brief/`, `.claude/skills/`) — USER's intent turned into a
+prompt a fresh session can run, posted for a 🚀 instead of run: an issue brief (the change in
+mathematical terms, slices with their review cost, checks, `TODO.md` boxes) and an experiment brief
+(hypothesis, the refuting number, the decision it buys, budget, what is recorded). Binds nothing: a
+session loads it when asked for a brief. USER: *"i keep hearing people (including anthropic
+engineers) say i shouldn't be prompting you directly i should ask you to prompt yourself, how do i
+do that in the context of discopy-next development and research on the wiki?"*, then *"yes draft
+the brief skill"*.
+
 ## 2026-10-29
 
 **Attribution is harness-agnostic** (`AGENTS.md`, `OPERATIONS.md`, `template/memory/`) — posts
