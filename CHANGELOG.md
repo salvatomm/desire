@@ -5,6 +5,15 @@ Entries state the changes, no explanation of why.
 
 ## 2026-11-05
 
+**Five skills** (`.agents/skills/`, `.claude/skills/`,
+`.github/workflows/lint.yml`) — `pr-status` measures a pull request live and gives one verdict;
+`remerge` merges a target branch into a pull request's branch locally, never pushing;
+`post-check` lints a draft before it is posted; `work-notes` lists the items a turn touched with no
+`WORK/` log line and lints the notes; `rules-edit` is the checklist for a rules PR, with a diff
+check for installation values. CI runs each skill's tests. USER: *"look at all our previous
+interactions in memory and desire repos then open a new desire PR with skills that would speed up
+and improve our future work"*.
+
 **The brief skill** (`.agents/skills/brief/`, `.claude/skills/`) — USER's intent turned into a
 prompt a fresh session can run, posted for a 🚀 instead of run: an issue brief (the change in
 mathematical terms, slices with their review cost, checks, `TODO.md` boxes) and an experiment brief
