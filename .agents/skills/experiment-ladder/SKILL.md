@@ -5,9 +5,9 @@ description: Spend a GPU budget on machine-learning experiments in rungs that ea
 
 # Experiment ladder
 
-No large run on a hunch. The budget is spent in rungs, each about ten times the cost of the one
-before, and each ends in a decision written down before it started. A rung that cannot change the
-next decision is not run.
+No large run on a hunch. The budget is spent in rungs, the first a hundredth of it, and each ends
+in a decision written down before it started. A rung that cannot change the next decision is not
+run.
 
 ## The rungs
 
@@ -21,15 +21,16 @@ next decision is not run.
 2. **Comparison, ~15%.** The change on the same schedule, scales, data and evaluation. The claim is
    the gap at matched compute, at every scale: a gap that grows with scale is the result, one that
    shrinks is a warning, one inside the seed spread is no gap.
-3. **Decision**, with whoever owns the budget. Fund the full run only if the change's curve sits
-   above the baseline's and is not flattening, and write down the number the full run should give
+3. **Decision**, with whoever owns the budget. Fund the full run only if the change's curve is
+   better than the baseline's (lower for a loss) and is not flattening, and write down the number the full run should give
    before it starts.
 
 Before any rung, write down:
 
 - the claim, and the number that would refute it;
 - the kill rule, e.g. *at 10% of the run, more than X below the projected curve: stop*;
-- the cost cap, enforced by a timeout on every remote call, not by watching;
+- the cost cap, enforced by a timeout on every remote job itself, not on the call that started it
+  and not by watching;
 - which evaluation it reads, logged before the read.
 
 ## Curves for the price of one run
@@ -43,7 +44,8 @@ Before any rung, write down:
   al., 2023, arXiv 2304.15004), and pass@k thresholds the same way: report them, do not extrapolate
   them.
 - **Extrapolate at most a factor of ten** past the largest point.
-- **Seeds set the noise floor**: two or three at the smallest scale, before reading any gap.
+- **Seeds set the noise floor**: two or three at the smallest scale, before reading any gap. A gap
+  at a larger scale is read against that floor, and re-seeded there when it is close to it.
 
 ## Hyperparameters that transfer: μP
 

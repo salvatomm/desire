@@ -19,8 +19,7 @@ bundle is not an ask. On a next repo, an ask a later PR can reverse is due 48 ho
 from USER: an agent takes the default, says so on the item and closes the `waiting` issue linking
 it. Upstream, collaborators' work, settings, access, money, publication or visibility, licence,
 anything irreversible and asks with no recommendation still wait. Replaces: a next-repo bug that
-needs a decision gets one 🚀-able comment and waits. Daylight proposed: *"Give every ask a default
-and a date. On next, where changes are reversible, the agent takes the default after 48 hours."*
+needs a decision gets one 🚀-able comment and waits.
 USER: *"spawn another to prune the board and write the default-and-date rule"*. Ruling: #207.
 
 **Next repos lose their experiments line** (`AGENTS.md`) — "experiments live on branches of the

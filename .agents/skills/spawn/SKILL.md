@@ -29,8 +29,10 @@ and no skills: it reads as confused, and what it posts follows no rule.
   1. attach MEMORY_REPO and each work repo, with push only where it writes;
   2. clone each where the attach result says;
   3. register each clone, so its instructions and skills load on the next turn;
-  4. read `config.env`, the board and the task's `WORK/` notes, check out the day PR's branch;
-  5. **if an attach is refused, stop and message the parent**: no workaround, no retry.
+  4. in the MEMORY_REPO clone, read `config.env`, the board and the task's `WORK/` notes, and
+     check out the day PR's branch there; a work repo gets its own branch and pull request;
+  5. **if an attach, a clone or a register fails, stop and message the parent**: no workaround,
+     no retry.
 - **Name what the runtime cannot set.** A session is created with a model and no effort level:
   say to USER that the effort is only a line of the prompt.
 - **Ask for the report as a message to the parent** when the task ends or blocks. A child that
