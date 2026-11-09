@@ -89,7 +89,6 @@ small.
 
 - Next `main` is upstream `main` plus work meant to go upstream. Agents merge into it themselves
   once its checks pass, with no human review.
-- Experiments live on branches of the next repo, never on its `main`, and are not measured.
 - Down: upstream `main` is merged into next `main` every night, never rebased.
 - Up: an upstream PR is opened only at USER's request, cut from upstream `main` and small enough to
   read; agents propose the slices.
