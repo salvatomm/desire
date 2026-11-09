@@ -12,6 +12,28 @@ attach goes to USER. Binds nothing: a session loads it before creating another. 
 when you spawn it's without memory and desire so the child sessions are confused"*, then *"make
 sure to add that as a skill in desire so you don't make that as a mistake next time"*.
 
+**Every ask has a default and a date; on a next repo a reversible one is due after 48 hours**
+(`AGENTS.md`, `OPERATIONS.md`, `EVENING.md`, `.agents/skills/brief/`) — a 🚀-able comment or a
+`waiting`/`yours` issue asks one decision, names its recommended option and the day asked; a
+bundle is not an ask. On a next repo, an ask a later PR can reverse is due 48 hours on with no word
+from USER: an agent takes the default, says so on the item and closes the `waiting` issue linking
+it. Upstream, collaborators' work, settings, access, money, publication or visibility, licence,
+anything irreversible and asks with no recommendation still wait. Replaces: a next-repo bug that
+needs a decision gets one 🚀-able comment and waits. Daylight proposed: *"Give every ask a default
+and a date. On next, where changes are reversible, the agent takes the default after 48 hours."*
+USER: *"spawn another to prune the board and write the default-and-date rule"*. Ruling: #207.
+
+**Next repos lose their experiments line** (`AGENTS.md`) — "experiments live on branches of the
+next repo, never on its `main`", from 2026-10-14, is deleted
+([#163](https://github.com/toumix/desire/issues/163)).
+
+**The experiment-ladder skill** (`.agents/skills/experiment-ladder/`, `.claude/skills/`) — a GPU
+budget spent in rungs: smoke test, scaling curve, matched-compute comparison, then the full run;
+warmup–stable–decay cool-downs for curves, μP and the spectral condition for hyperparameters that
+transfer across width, held-out tasks and sealed reads for evaluation. Binds nothing: a session
+loads it when it plans training runs. USER: *"can you bundle this into a reusable skill? seems all
+like very useful strategies!"*
+
 ## 2026-11-05
 
 **Five skills** (`.agents/skills/`, `.claude/skills/`,
