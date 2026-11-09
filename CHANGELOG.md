@@ -3,6 +3,15 @@
 What landed on `main`, newest first — when each rule started binding, and what it replaced.
 Entries state the changes, no explanation of why.
 
+## 2026-11-09
+
+**The spawn skill** (`.agents/skills/spawn/`, `.claude/skills/`) — a child session is created on
+DESIRE_REPO, its prompt opens with the attach, clone and register steps for MEMORY_REPO and the
+work repos, and the parent reads its transcript for those steps before leaving it; a refused
+attach goes to USER. Binds nothing: a session loads it before creating another. USER: *"problem
+when you spawn it's without memory and desire so the child sessions are confused"*, then *"make
+sure to add that as a skill in desire so you don't make that as a mistake next time"*.
+
 ## 2026-11-05
 
 **Five skills** (`.agents/skills/`, `.claude/skills/`,
