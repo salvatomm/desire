@@ -3,6 +3,19 @@
 What landed on `main`, newest first — when each rule started binding, and what it replaced.
 Entries state the changes, no explanation of why.
 
+## 2026-11-09
+
+**Every ask has a default and a date; on a next repo a reversible one is due after 48 hours**
+(`AGENTS.md`, `OPERATIONS.md`, `EVENING.md`, `.agents/skills/brief/`) — a 🚀-able comment or a
+`waiting`/`yours` issue asks one decision, names its recommended option and the day asked; a
+bundle is not an ask. On a next repo, an ask a later PR can reverse is due 48 hours on with no word
+from USER: an agent takes the default, says so on the item and closes the `waiting` issue linking
+it. Upstream, collaborators' work, settings, access, money, publication or visibility, licence,
+anything irreversible and asks with no recommendation still wait. Replaces: a next-repo bug that
+needs a decision gets one 🚀-able comment and waits. Daylight proposed: *"Give every ask a default
+and a date. On next, where changes are reversible, the agent takes the default after 48 hours."*
+USER: *"spawn another to prune the board and write the default-and-date rule"*. Ruling: #207.
+
 ## 2026-11-05
 
 **Five skills** (`.agents/skills/`, `.claude/skills/`,

@@ -124,6 +124,9 @@ internal session or thread ID is not a URL and must never be turned into one.
 
 ## Issues and reviews
 - A blocker recorded only in a note or on the board has not been asked: it is asked on its PR.
+- An ask's 48 hours run from its own comment. Any comment, review or react of USER's on the item
+  or its issue since then is a word, and the ask waits for a turn to read it. A later PR can
+  reverse a change that is commits on next `main` and nothing else: nothing released or sent.
 - A pull request closing an issue uses GitHub's syntax, one keyword per issue on the same line as
   its reference; what merging closes is read from `closed_by_pull_requests`, never from our prose.
 - Answer a thread once the change has landed, then resolve it if your job is done.
