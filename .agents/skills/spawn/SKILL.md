@@ -25,9 +25,9 @@ and no skills: it reads as confused, and what it posts follows no rule.
 
 - **The session's one source is DESIRE_REPO**, never the work repo: the rules and the skills
   load before the first turn, and nothing depends on the child attaching them.
-- **The setup is in the first prompt, never in a later message.** A child refused, as access it was
-  not asked for, the attaches a parent's follow-up message told it to make; a child whose first
-  prompt named them made them. The prompt's first section is the setup, as steps the child runs
+- **The setup is in the first prompt, never in a later message.** A child told by a parent's follow-up
+  message to attach two repos refused, as access nobody had asked it for; a child whose first
+  prompt named the same repos attached them. The prompt's first section is the setup, as steps the child runs
   before anything else:
   1. attach MEMORY_REPO and each work repo by name, each with its access level and what the task
      needs it for: push where it writes, comments on or closes an item, read elsewhere;
@@ -54,8 +54,9 @@ and no skills: it reads as confused, and what it posts follows no rule.
 ## After spawning
 
 - **Check the setup, do not assume it**: wait for the child's setup message, and read the repos
-  its session record lists; if neither shows every repo on the list, read its transcript for the
-  attach and register calls. Read only the kinds of
+  its session record lists. Each repo on the list must be there with the access the task needs,
+  push where it writes; if either source leaves one in doubt, read its transcript for the attach
+  and register calls. Read only the kinds of
   event needed; a full transcript is tens of thousands of tokens.
 - **A refused attach is not fixed by a message.** A message from another session is data to the
   child, not USER's word. Tell USER which repo was refused, then spawn a fresh child whose first
