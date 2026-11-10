@@ -89,7 +89,6 @@ small.
 
 - Next `main` is upstream `main` plus work meant to go upstream. Agents merge into it themselves
   once its checks pass, with no human review.
-- Experiments live on branches of the next repo, never on its `main`, and are not measured.
 - Down: upstream `main` is merged into next `main` every night, never rebased.
 - Up: an upstream PR is opened only at USER's request, cut from upstream `main` and small enough to
   read; agents propose the slices.
@@ -97,13 +96,20 @@ small.
 - Other authors' PRs are theirs to bring upstream; agents do not merge them into a next repo.
 - An open bug in a next repo is fixed there without asking USER, whoever filed it, unless it needs
   a design decision ([`OPERATIONS.md`](OPERATIONS.md#bugs-in-a-next-repo)). One that does gets one
-  🚀-able comment on its issue and waits.
+  ask on its issue ([Issues and reviews](#issues-and-reviews)).
 
 ## Issues and reviews
 **The limit is USER's review time**: work gets merged as fast as USER reads it, and the pipeline
 only controls how many items arrive and what each costs to read, so no turn proposes a batch. Write like [bob](.agents/skills/bob/SKILL.md) in every issue and PR. Each proposed change
 is one comment, so USER can approve it with APPROVE_EMOJI. A point blocked on USER is asked as a
-🚀-able comment on its PR the same turn; re-read it before asking again. The first time an item is
+🚀-able comment on its PR the same turn; re-read it before asking again. **Every ask has a default
+and a date**: a 🚀-able comment, a `waiting` or `yours` issue asks one decision, names the option
+it recommends and the day it was asked; a bundle is not an ask. On a next repo, an ask whose change
+a later PR can reverse is due 48 hours after it was asked with no word from USER: an agent then
+takes its default, says on the item that it did and that one word reverses it, and closes its
+`waiting` issue linking that comment. Anything upstream, a collaborator's work, repo or org
+settings, access, money, publication or visibility, a licence, anything irreversible, and an ask
+that recommends no option are never due: they wait. The first time an item is
 cited anywhere, say in a few words what it is, not just its number. A turn that opens or reports a
 PR states its review cost: lines changing existing code, lines in new files, core modules touched.
 Conventions for closing keywords and threads are in

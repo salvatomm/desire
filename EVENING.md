@@ -17,11 +17,12 @@ and keeps everything else moving. It runs these steps in order:
      every expected check passed
    - blocked on one named external action, which it asked for on its pull request the same turn
 
-   USER's explicit orders come first, then the next repos' bugs that need no decision
-   ([`OPERATIONS.md`](OPERATIONS.md#bugs-in-a-next-repo)), oldest first and without asking, then
+   USER's explicit orders come first, then the asks that are due, then the next repos' bugs that
+   need no decision ([`OPERATIONS.md`](OPERATIONS.md#bugs-in-a-next-repo)), oldest first and without asking, then
    the items closest to done. Sub-agents take items in parallel when the board shows no collision
    between them; colliding items go one after the other, in the forced merge order. A bug that
-   needs a decision gets its 🚀-able comment and is set aside; a few bugs in one module may share a
+   needs a decision gets its ask and is set aside until it is answered or due
+   ([`AGENTS.md`](AGENTS.md#issues-and-reviews)); a few bugs in one module may share a
    pull request, merged once its checks pass.
 6. **Everywhere else, build nothing new** beyond USER's explicit orders. Keep our open items
    moving instead: answer their review threads, fix their CI, resolve their conflicts, and do the
