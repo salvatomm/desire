@@ -5,30 +5,24 @@ Entries state the changes, no explanation of why.
 
 ## 2026-11-10
 
-**`CLAUDE.md` is back, one line: `@AGENTS.md`** (`CLAUDE.md`, `template/memory/CLAUDE.md`) — a
-fresh Claude Code session loaded nothing without it. USER: *"argh i tried and it didn't load,
-let's add the CLAUDE.md back in (still just @AGENTS.md)"*.
-
 **Amp entry points and runtime boundaries** (`AGENTS.md`, `OPERATIONS.md`, `README.md`,
 `CLAUDE.md`, `.github/lint.py`, `template/README.md`, `.agents/skills/pr-shepherd/`,
 `.agents/skills/brief/`, `template/memory/`) — Daylight
-moves into `AGENTS.md` as an interactive-only section and its separate file is deleted. The obsolete
-`CLAUDE.md` entry point is removed; scheduled runs select Birdsong or Evening. The heartbeat fallback
+moves into `AGENTS.md` as an interactive-only section and its separate file is deleted; `CLAUDE.md`
+imports `AGENTS.md` alone; scheduled runs select Birdsong or Evening. The heartbeat fallback
 and its skill are removed. Amp setup covers global guidance, sibling skills and separately
 configured schedules. Rules respect the harness's
 instruction hierarchy. Identity checks discover the MCP tool and set local authorship, preserving
 Amp-managed signing. PR monitoring verifies active subscriptions and reports unavailable follow-up.
 Read-only discussion with no work or new durable directive requires no memory writeback.
 USER: *"update the prompts open a PR"*, *"let's remove that fallback altogether it's not needed
-anymore"*, *"let's remove the DAYLIGHT.md as a file and make it into a section of AGENTS.md"*,
-*"just remove the file altogether it's not needed anymore"* (on `CLAUDE.md`).
+anymore"*, *"let's remove the DAYLIGHT.md as a file and make it into a section of AGENTS.md"*.
 Then Daylight drops its "Leave the plan" step and its interactive-only line, the opening drops the
 memory-loading and harness-setup lines, and Daylight names the `brief` and `spawn` skills. USER: *"that's useless for an agent to
 know let's drop it"*, *"you can mention the brief skill here"*, *"you can mention the spawn skill
 here"*, *"drop this bullet point it doesn't happen that often to have a day session just to leave
 work for the night, most of the time i want the work to happen straight away"*.
-The memory seed loses its `CLAUDE.md` too; its `AGENTS.md` imports `config.env` and the board.
-USER: *"let's try to get rid of it altogether"*.
+The memory seed's `AGENTS.md` imports `config.env` and the board.
 Closes #201.
 
 ## 2026-11-09
