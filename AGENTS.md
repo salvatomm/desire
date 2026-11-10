@@ -70,8 +70,9 @@ issue on evidence, linking it, and never closes a `yours` one.
 
 One pull request per day on MEMORY_REPO, titled with the day, ready for review, carries the day's
 file changes. A turn that does work or receives a new durable directive pushes its memory changes
-there and leaves one comment saying what it did. Read-only discussion with neither needs no
-writeback and creates no item just to record the conversation.
+there and leaves one comment saying what it did; a scheduled run that finds nothing to do says so
+in one line. Read-only discussion with neither needs no writeback and creates no item just to
+record the conversation.
 The turn that opens a new day's PR merges the previous one first. Its comments are short-term
 memory, discarded on merge: what should outlive it goes in a file or an issue. The mechanics are in
 [`OPERATIONS.md`](OPERATIONS.md#the-day-pr).
@@ -86,8 +87,8 @@ shape; [`OPERATIONS.md`](OPERATIONS.md#work-notes) has the naming and what the s
 
 ## Next repos
 NEXT_REPOS pairs a WORK_REPO with its next repo, `<upstream>:<next>`. The upstream stays fully
-human-reviewed; the next repo is the agents', and their job is to keep the drift between the two
-small.
+human-reviewed; the next repo is the agents'. Their work is measured by the library's quality as
+it all merges into one repo; the drift between the two is measured every night as a reading.
 
 - Next `main` is upstream `main` plus work meant to go upstream. Agents merge into it themselves
   once its checks pass, with no human review.

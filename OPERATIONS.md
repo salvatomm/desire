@@ -50,7 +50,8 @@ from upstream to next adds no drift, it only moves it.
 An open issue reporting a bug in a next repo needs no design decision when what is right is already
 said — by a law, a docstring, `STYLE.md` or the behaviour upstream — and the fix chooses nothing: no
 public name beyond the protocol it completes, no stated convention changed, no pick between readings
-the issue leaves open. A bug an open pull request already addresses is left to it.
+the issue leaves open. A bug an open pull request already addresses is left to it, and so is one
+whose issue carries an unanswered ask from either installation working the next repo.
 
 ## Reading the sweep
 [`sweep.py`](template/memory/.agents/skills/sweep/sweep.py) runs from the MEMORY_REPO clone as

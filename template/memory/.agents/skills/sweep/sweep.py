@@ -15,6 +15,7 @@ Exit 0 and "clean" on a clean sweep, exit 1 with one line per finding, exit 2
 when GitHub could not be read — an incomplete sweep is neither clean nor a
 finding, and reading it as clean is how a live 🚀 goes unanswered.
 """
+import http.client
 import json
 import os
 import pathlib
@@ -405,7 +406,7 @@ def main(arguments):
     try:
         findings = sweep(arguments[0], [int(n) for n in arguments[1:]], since,
                          config(find_config()))
-    except (urllib.error.URLError, TimeoutError) as error:
+    except (OSError, http.client.HTTPException) as error:
         print(f"{arguments[0]}: GitHub unreadable, the sweep is incomplete and"
               f" says nothing about this repo: {error}", file=sys.stderr)
         return 2

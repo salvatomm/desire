@@ -364,5 +364,22 @@ class Memory(unittest.TestCase):
         self.assertNotIn("day PR", err)
 
 
+class Incomplete(unittest.TestCase):
+    """A dropped connection is an incomplete sweep, exit 2, never findings."""
+
+    def test_a_dropped_connection_exits_2(self):
+        import http.client
+        from unittest import mock
+        for error in (http.client.RemoteDisconnected("closed"),
+                      ConnectionResetError("reset"),
+                      urllib.error.URLError("denied")):
+            with self.subTest(error=type(error).__name__), \
+                    mock.patch.object(sweep, "sweep", side_effect=error), \
+                    mock.patch.object(sweep, "find_config", return_value=None), \
+                    mock.patch.object(sweep, "config", return_value={}), \
+                    contextlib.redirect_stderr(io.StringIO()):
+                self.assertEqual(sweep.main(["owner/repo"]), 2)
+
+
 if __name__ == "__main__":
     unittest.main()

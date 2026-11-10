@@ -5,6 +5,16 @@ Entries state the changes, no explanation of why.
 
 ## 2026-11-10
 
+**Next repos are measured by quality; idle runs say so; an open ask is hands off** (`AGENTS.md`,
+`OPERATIONS.md`, `template/memory/.agents/skills/sweep/`) — the agents' work on a next repo is
+measured by the library's quality, drift stays a nightly reading. A scheduled run that finds
+nothing leaves one line on the day PR. A next-repo bug whose issue carries an unanswered ask from
+either installation is left alone. `sweep.py` exits 2 on any dropped connection. USER: *"the main
+test is whether all this work can get merged into one repo without creating a mess, adding
+features without sacrificing library quality"*, *"not sure why we would stop measuring, doesn't
+cost much"*, *"if the routine runs and finds nothing then it can write that down"*, and "hands
+off" on #203.
+
 **The memory seed ships its linter** (`template/memory/`, `OPERATIONS.md`, `.github/`) —
 `scripts/lint_memory.py` checks `WORK/` note structure, dates, logs, board length and local links
 offline, with optional GitHub and HTTP-link modes; its script, tests, requirements and workflow
