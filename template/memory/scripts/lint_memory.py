@@ -130,7 +130,7 @@ def wrapped(lines, number):
     """The indented lines that continue the bullet on line `number`."""
     rest = []
     for line in lines[number:]:
-        if not line.startswith("  "):
+        if not line[:1].isspace() or not line.strip():
             break
         rest.append(line.strip())
     return " " + " ".join(rest) if rest else ""

@@ -188,9 +188,10 @@ class AuditTest(unittest.TestCase):
         self.assertFalse(any("missing-note" in f for f in audit.findings))
 
     def test_read_date_on_a_wrapped_line(self):
-        self.write("WORK/project/1.md", NOTE.replace(" · read ", "\n  wrapped · read "))
-        audit = self.audit()
-        self.assertFalse(any("read-date" in f for f in audit.findings), audit.findings)
+        for indent in ("  ", "\t", " "):
+            self.write("WORK/project/1.md", NOTE.replace(" · read ", f"\n{indent}wrapped · read "))
+            audit = self.audit()
+            self.assertFalse(any("read-date" in f for f in audit.findings), (indent, audit.findings))
 
     def test_memory_repo_notes_are_allowed(self):
         self.write("WORK/memory/1.md", NOTE.replace("project#1", "memory#1"))
