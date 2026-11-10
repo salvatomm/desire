@@ -44,7 +44,7 @@ one `config.env`, in the repo that is yours. What is here is only the rules.
 
 ## Amp
 
-Amp loads `AGENTS.md`, using `CLAUDE.md` only as a fallback when the former is absent. It does not
+Amp loads `AGENTS.md`. It does not
 discover guidance in sibling repositories. Put a loader in Amp's global instructions so it also
 applies when the working directory is a WORK_REPO. For orbs with the clones under
 `~/workspace/repos/`, use this, adjusting the paths to your layout:
@@ -60,8 +60,7 @@ If any required file is unavailable, say so.
 ```
 
 Daylight is part of the shared operating file, but only interactive sessions execute it.
-Amp supports `@` references in guidance, but `CLAUDE.md`'s imports are not added when `AGENTS.md`
-takes precedence. Never place private config values in public guidance.
+Never place private config values in public guidance.
 
 Skills in the sibling clones need discovery too. Add their `.agents/skills/` directories to
 `amp.skills.path` and reload skills, or install them as personal/workspace skills. Confirm the

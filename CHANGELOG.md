@@ -7,7 +7,7 @@ Entries state the changes, no explanation of why.
 
 **Amp entry points and runtime boundaries** (`AGENTS.md`, `OPERATIONS.md`, `README.md`,
 `CLAUDE.md`, `.github/lint.py`, `template/README.md`, `.agents/skills/pr-shepherd/`,
-`.agents/skills/brief/`) — Daylight
+`.agents/skills/brief/`, `template/memory/`) — Daylight
 moves into `AGENTS.md` as an interactive-only section and its separate file is deleted. The obsolete
 `CLAUDE.md` entry point is removed; scheduled runs select Birdsong or Evening. The heartbeat fallback
 and its skill are removed. Amp setup covers global guidance, sibling skills and separately
@@ -23,6 +23,8 @@ memory-loading and harness-setup lines, and Daylight names the `brief` and `spaw
 know let's drop it"*, *"you can mention the brief skill here"*, *"you can mention the spawn skill
 here"*, *"drop this bullet point it doesn't happen that often to have a day session just to leave
 work for the night, most of the time i want the work to happen straight away"*.
+The memory seed loses its `CLAUDE.md` too; its `AGENTS.md` imports `config.env` and the board.
+USER: *"let's try to get rid of it altogether"*.
 Closes #201.
 
 ## 2026-11-05

@@ -31,9 +31,7 @@ On Claude Code on the web, the hook sets the commit identity from `AGENT` and `A
 project directory; a multi-repo session has no project directory, so point at it by absolute path
 instead — [the root README](../README.md#verified-commits) has the snippet.
 
-For Amp, use the [global loader and skill setup](../README.md#amp) instead. The seed's
-`CLAUDE.md` is not loaded alongside its `AGENTS.md`, so its board and config references are not
-startup imports there. Leave managed signing intact and set the agent author locally on each clone.
+For Amp, use the [global loader and skill setup](../README.md#amp) instead. Leave managed signing intact and set the agent author locally on each clone.
 
 What you get is empty on purpose. `README.md` is a board with no state on it yet, and the two `TEMPLATE.md` files are shapes rather than content — the
 first turn writes the real thing. Leave the templates in place: they are what an agent reads when
