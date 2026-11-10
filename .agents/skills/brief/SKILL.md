@@ -65,7 +65,8 @@ stand alone, the design is not finished: go back to USER, not forward to code.
 ## Posting
 
 - One brief is one issue on the repo where it runs, or one comment on the item it extends, so
-  USER can 🚀 it whole ([Issues and reviews](../../../AGENTS.md#issues-and-reviews)). Never a
+  USER can 🚀 it whole, and like any ask it has a default and a date
+  ([Issues and reviews](../../../AGENTS.md#issues-and-reviews)). Never a
   batch of briefs in one turn.
 - Write like [bob](../bob/SKILL.md): the brief is read by USER first, the runner second.
 - Run `post-check` on the draft before posting it, where that skill is installed.
