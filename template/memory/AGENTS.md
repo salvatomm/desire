@@ -17,4 +17,7 @@ What is where:
   PR's description.
 - The open issues — what waits on USER, labelled `yours` or `waiting`.
 
+Run `python scripts/lint_memory.py` for the automated memory checks; setup,
+rule coverage and optional GitHub/link audits are in its docstring.
+
 This file loads the config and the board: @config.env @README.md

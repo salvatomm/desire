@@ -5,6 +5,12 @@ Entries state the changes, no explanation of why.
 
 ## 2026-11-10
 
+**The memory seed ships its linter** (`template/memory/`, `OPERATIONS.md`, `.github/`) —
+`scripts/lint_memory.py` checks `WORK/` note structure, dates, logs, board length and local links
+offline, with optional GitHub and HTTP-link modes; its script, tests, requirements and workflow
+are copies the live MEMORY_REPO carries verbatim, and its docs are its docstring. USER: *"also merge the linter while we're at
+it"*, *"i'd rather have the docs live with the code directly than in a separate folder"*.
+
 **Amp entry points and runtime boundaries** (`AGENTS.md`, `OPERATIONS.md`, `README.md`,
 `CLAUDE.md`, `.github/lint.py`, `template/README.md`, `.agents/skills/pr-shepherd/`,
 `.agents/skills/brief/`, `template/memory/`) — Daylight

@@ -24,7 +24,9 @@ SERVERS = {"claude-code-remote"}
 
 # Files a MEMORY_REPO clone carries verbatim from the seed.
 COPIES = [".claude/settings.json", ".claude/hooks/session-start.sh",
-          ".agents/skills/sweep/sweep.py", ".agents/skills/sweep/test_sweep.py"]
+          ".agents/skills/sweep/sweep.py", ".agents/skills/sweep/test_sweep.py",
+          "scripts/lint_memory.py", "tests/test_lint_memory.py",
+          "requirements-lint.txt", ".github/workflows/lint.yml"]
 
 # The files that state rules, and the run of words two of them may not share.
 RULES = ["AGENTS.md", "BIRDSONG.md", "EVENING.md", "OPERATIONS.md",

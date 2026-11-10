@@ -1,9 +1,10 @@
 # template
 
 The seed of a MEMORY_REPO. Nothing here is loaded by a session: it is copied once, into a fresh
-private repository, and then it is that repository's to rewrite — with two exceptions,
-`.agents/skills/sweep/` and `.claude/`, which are the same files running in both places. **A
-change to either lands in this copy and in the live one the same turn**: this is the public half,
+private repository, and then it is that repository's to rewrite — with these exceptions,
+`.agents/skills/sweep/`, `.claude/`, and the memory linter (script, tests, dependencies
+and CI workflow), which run identically in both places. **A
+change to these lands in this copy and in the live one the same turn**: this is the public half,
 so it is the one anyone can read, and the two drifting apart is code nobody can review.
 
 The two clones sit side by side, and these run from the directory holding them — the same layout
