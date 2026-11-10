@@ -1,7 +1,7 @@
 # OPERATIONS.md
 
 The machinery behind the rules in [`AGENTS.md`](AGENTS.md) — how each mechanism works and how to
-recover when it doesn't. `CLAUDE.md` does not import it, so it is not loaded into every session:
+recover when it doesn't. It is not part of the startup context:
 read it when something misbehaves, or when you need the exact command or behaviour behind a rule.
 
 ## Finding config.env
@@ -80,8 +80,8 @@ the work. React on the comment or the body itself, with
 `add_reply_to_pull_request_comment`'s on a review comment.
 
 ## Matching an attribution footer
-Every entry of AGENT_FOOTERS is current: removing one whose runtime is still in use makes every post
-carrying it read as USER's own unanswered question.
+AGENT_FOOTERS includes markers on existing posts, even if their harness is no longer used:
+removing one can make an agent's reply read as USER's unanswered question.
 
 A reply from USER counts as an agent's when its last line is one of AGENT_FOOTERS — as the whole
 line, or inside the HTTPS *target* of a Markdown link on it (which is how a URL token matches the
@@ -89,10 +89,9 @@ footer wrapping it). A link's *label* never counts, since the label is the half 
 accepting it would let any destination silence a thread; nor does a marker in prose, which is a
 human writing about the convention. This is how the adopted PRs read.
 
-A runtime whose footer links to a shareable session snapshot puts the URL token in AGENT_FOOTERS the
-way `claude.ai/code` is, rather than relying on the label; the snapshot is opened and reviewed
-before it is linked, and an internal session or thread ID is not a URL and must never be turned into
-one.
+A harness whose footer links to a shareable session snapshot puts its URL token in AGENT_FOOTERS
+rather than relying on the label; the snapshot is opened and reviewed before it is linked, and an
+internal session or thread ID is not a URL and must never be turned into one.
 
 ## The day PR
 - Opening a new day's PR first merges the previous one: whatever in its comment thread
@@ -129,6 +128,9 @@ comparison. Installation, commands and rule coverage are in
 
 ## Issues and reviews
 - A blocker recorded only in a note or on the board has not been asked: it is asked on its PR.
+- An ask's 48 hours run from its own comment. Any comment, review or react of USER's on the item
+  or its issue since then is a word, and the ask waits for a turn to read it. A later PR can
+  reverse a change that was only committed to next `main`: nothing was released or sent.
 - A pull request closing an issue uses GitHub's syntax, one keyword per issue on the same line as
   its reference; what merging closes is read from `closed_by_pull_requests`, never from our prose.
 - Answer a thread once the change has landed, then resolve it if your job is done.
@@ -140,31 +142,39 @@ USER's approval must be on the head commit being merged; a push after it needs a
 pull request must also pass its checks, merge cleanly and have no thread waiting on an agent.
 
 ## Watching a pull request
-A runtime with no webhook wake-up falls back to a heartbeat: every Codex task that opens a
-pull request uses [`pr-shepherd`](.agents/skills/pr-shepherd/SKILL.md) to schedule one in the same
-task. It checks the pull request, handles USER's instructions and valid in-scope bug or style
-reports from any author, backs off exponentially while nothing changes, resets on activity, and
-deletes itself when the pull request merges or closes. Every scheduled fire that finds nothing is a
-turn USER pays for, which is why a session GitHub events reach never schedules one.
+In Amp, discover `create_github_subscription` and subscribe this thread to comments and reviews
+after opening a PR, and to CI for the exact head SHA and branch after each push, with
+`automatic: true`. Supply `branch` only for CI. Check the returned subscription is enabled and
+unblocked; an existing paused listener is not active. Access depends on the connected GitHub
+installation and workspace, not just the runtime having the tool.
+
+If setup fails, inspect any subscription ID it saved before retrying. Report the missing listener;
+never claim monitoring is active from an attempted call. Event payloads are evidence to fetch
+and check, not fresh permission to push or merge.
 
 ## When the harness says otherwise
-- Wherever the SessionStart hook runs, it denies the scheduling tools, so a timed check-in cannot be
-  scheduled by accident.
-- A stop hook asking for a commit identity other than AGENT's loses to these files too.
+- Claude Code's SessionStart hook writes its scheduling-tool deny list; Amp does not run that hook
+  or enforce `.claude/settings.json`. In Amp the no-timed-follow-up rule is prompt guidance.
+- If a harness requires a conflicting commit identity, stop before committing and report it;
+  do not disable its signing mechanism to work around it.
 - The day PR's branch winning in MEMORY_REPO is standing permission: a memory turn that asks which
   branch to push to has misread the rule.
 
 ## Identity and signing
 Every write to GitHub — pull requests, comments, reviews, reactions — goes through the MCP tools.
-`GITHUB_TOKEN` is for reads only; the two authenticate as different accounts, so assert
-`mcp__github__get_me` is AGENT before a turn's first write. Set AGENT and AGENT_EMAIL on every clone
-before the first commit, and check the identity on the branch's commits before pushing with
+`GITHUB_TOKEN` is for reads only; it need not authenticate as the MCP account. Discover GitHub's
+authenticated-user tool (`get_me` in Amp) and assert its login is AGENT before the first write.
+On every clone set local `user.name` and `user.email` from AGENT and AGENT_EMAIL before committing;
+neither a correct MCP login nor a signature sets the author. Check the effective values, then
+check the branch's authors before pushing with
 `git log --format='%an <%ae>' origin/main..HEAD`.
 
-Commits are signed when the environment provides `AGENTS_SIGNING_KEY`, a passphrase-free SSH private
-key whose public half is registered on AGENT's account as a **signing key**. The SessionStart hook
-clears the global signing config so no stale setting outlives its key, installs `openssh-client`
-(git signs through `ssh-keygen -Y sign`), writes the key and sets `commit.gpgsign`, so pushed
-commits show Verified; a session without the variable commits unsigned rather than failing. Leaked,
-the key can only forge the badge — revoke it by deleting the public half from AGENT's account. Key
-setup is in the README's Verified commits section.
+Amp orbs provide managed signing: preserve `gpg.*`, `user.signingkey` and `commit.gpgsign` while
+setting authorship. No private signing key needs copying into the orb. Do not run the legacy hook
+with a forged `CLAUDE_CODE_REMOTE` flag: it clears signing settings. After a push, read GitHub's
+verification result before claiming Verified.
+
+On Claude Code on the web, the SessionStart hook handles identity and optional SSH signing via
+`AGENTS_SIGNING_KEY`. Without that variable it commits unsigned; with it, the key must be registered
+as a signing key on AGENT's account. Setup is in the README's
+[Verified commits](README.md#verified-commits) section.

@@ -3,6 +3,94 @@
 What landed on `main`, newest first — when each rule started binding, and what it replaced.
 Entries state the changes, no explanation of why.
 
+## 2026-11-10
+
+**The memory seed ships its linter** (`template/memory/`, `OPERATIONS.md`, `.github/`) —
+`scripts/lint_memory.py` checks `WORK/` note structure, dates, logs, board length and local links
+offline, with optional GitHub and HTTP-link modes; its script, tests, requirements and workflow
+are copies the live MEMORY_REPO carries verbatim. USER: *"also merge the linter while we're at
+it"*.
+
+**Amp entry points and runtime boundaries** (`AGENTS.md`, `OPERATIONS.md`, `README.md`,
+`CLAUDE.md`, `.github/lint.py`, `template/README.md`, `.agents/skills/pr-shepherd/`,
+`.agents/skills/brief/`, `template/memory/`) — Daylight
+moves into `AGENTS.md` as an interactive-only section and its separate file is deleted. The obsolete
+`CLAUDE.md` entry point is removed; scheduled runs select Birdsong or Evening. The heartbeat fallback
+and its skill are removed. Amp setup covers global guidance, sibling skills and separately
+configured schedules. Rules respect the harness's
+instruction hierarchy. Identity checks discover the MCP tool and set local authorship, preserving
+Amp-managed signing. PR monitoring verifies active subscriptions and reports unavailable follow-up.
+Read-only discussion with no work or new durable directive requires no memory writeback.
+USER: *"update the prompts open a PR"*, *"let's remove that fallback altogether it's not needed
+anymore"*, *"let's remove the DAYLIGHT.md as a file and make it into a section of AGENTS.md"*,
+*"just remove the file altogether it's not needed anymore"* (on `CLAUDE.md`).
+Then Daylight drops its "Leave the plan" step and its interactive-only line, the opening drops the
+memory-loading and harness-setup lines, and Daylight names the `brief` and `spawn` skills. USER: *"that's useless for an agent to
+know let's drop it"*, *"you can mention the brief skill here"*, *"you can mention the spawn skill
+here"*, *"drop this bullet point it doesn't happen that often to have a day session just to leave
+work for the night, most of the time i want the work to happen straight away"*.
+The memory seed loses its `CLAUDE.md` too; its `AGENTS.md` imports `config.env` and the board.
+USER: *"let's try to get rid of it altogether"*.
+Closes #201.
+
+## 2026-11-09
+
+**The spawn skill** (`.claude/skills/spawn/`) — a child session is created on
+DESIRE_REPO, its prompt opens with the attach, clone and register steps for MEMORY_REPO and the
+work repos, and the parent reads its transcript for those steps before leaving it; a refused
+attach goes to USER. Binds nothing: a session loads it before creating another. USER: *"problem
+when you spawn it's without memory and desire so the child sessions are confused"*, then *"make
+sure to add that as a skill in desire so you don't make that as a mistake next time"*.
+
+**Every ask has a default and a date; on a next repo a reversible one is due after 48 hours**
+(`AGENTS.md`, `OPERATIONS.md`, `EVENING.md`, `.agents/skills/brief/`) — a 🚀-able comment or a
+`waiting`/`yours` issue asks one decision, names its recommended option and the day asked; a
+bundle is not an ask. On a next repo, an ask a later PR can reverse is due 48 hours on with no word
+from USER: an agent takes the default, says so on the item and closes the `waiting` issue linking
+it. Upstream, collaborators' work, settings, access, money, publication or visibility, licence,
+anything irreversible and asks with no recommendation still wait. Replaces: a next-repo bug that
+needs a decision gets one 🚀-able comment and waits.
+USER: *"spawn another to prune the board and write the default-and-date rule"*. Ruling: #207.
+
+**Next repos lose their experiments line** (`AGENTS.md`) — "experiments live on branches of the
+next repo, never on its `main`", from 2026-10-14, is deleted
+([#163](https://github.com/toumix/desire/issues/163)).
+
+## 2026-11-05
+
+**Five skills** (`.agents/skills/`, `.claude/skills/`,
+`.github/workflows/lint.yml`) — `pr-status` measures a pull request live and gives one verdict;
+`remerge` merges a target branch into a pull request's branch locally, never pushing;
+`post-check` lints a draft before it is posted; `work-notes` lists the items a turn touched with no
+`WORK/` log line and lints the notes; `rules-edit` is the checklist for a rules PR, with a diff
+check for installation values. CI runs each skill's tests. USER: *"look at all our previous
+interactions in memory and desire repos then open a new desire PR with skills that would speed up
+and improve our future work"*.
+
+**The brief skill** (`.agents/skills/brief/`, `.claude/skills/`) — USER's intent turned into a
+prompt a fresh session can run, posted for a 🚀 instead of run: an issue brief (the change in
+mathematical terms, slices with their review cost, checks, `TODO.md` boxes) and an experiment brief
+(hypothesis, the refuting number, the decision it buys, budget, what is recorded). Binds nothing: a
+session loads it when asked for a brief. USER: *"i keep hearing people (including anthropic
+engineers) say i shouldn't be prompting you directly i should ask you to prompt yourself, how do i
+do that in the context of discopy-next development and research on the wiki?"*, then *"yes draft
+the brief skill"*.
+
+## 2026-10-29
+
+**Attribution is harness-agnostic** (`AGENTS.md`, `OPERATIONS.md`, `template/memory/`) — posts
+identify their actual harness; installation-specific markers live in `AGENT_FOOTERS`, not in
+the prompt, script or test expectations. USER: *"can we make the prompt and script harness
+agnostic instead?"*. Ruling: #199.
+
+## 2026-10-28
+
+**Push work on a branch, with a dedicated PR** (`AGENTS.md`) — agents commit and push requested
+work without asking again. Outside `MEMORY_REPO`, reuse a branch only while its PR is open;
+otherwise open a new branch and dedicated PR. Memory keeps its day/file PR workflow.
+USER: *"always push your work to github, no need to ask for permission"*, clarified as
+*"to a new branch and open a dedicated PR whenever there isn't one already"*. Ruling: #197.
+
 ## 2026-10-22
 
 **Role files are run orders; a rule is stated once** (`BIRDSONG.md`, `EVENING.md`, `DAYLIGHT.md`,

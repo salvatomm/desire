@@ -19,3 +19,5 @@ What is where:
 
 Run `python scripts/lint_memory.py` for the automated memory checks; setup,
 rule coverage and optional GitHub/link audits are in [`docs/lint.md`](docs/lint.md).
+
+This file loads the config and the board: @config.env @README.md

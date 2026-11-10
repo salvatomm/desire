@@ -27,10 +27,12 @@ two for `.claude/hooks/session-start.sh` — which is your memory clone's root o
 and this template's root before that, so `pytest .agents/skills/sweep/` passes here as it will
 there. Nothing is searched for and no repository name is hard-coded anywhere.
 
-The hook sets the commit identity from `AGENT` and `AGENT_EMAIL`, and signs when
+On Claude Code on the web, the hook sets the commit identity from `AGENT` and `AGENT_EMAIL`, and signs when
 `AGENTS_SIGNING_KEY` is in the environment. `.claude/settings.json` runs it when this repo is the
 project directory; a multi-repo session has no project directory, so point at it by absolute path
 instead — [the root README](../README.md#verified-commits) has the snippet.
+
+For Amp, use the [global loader and skill setup](../README.md#amp) instead. Leave managed signing intact and set the agent author locally on each clone.
 
 What you get is empty on purpose. `README.md` is a board with no state on it yet, and the two `TEMPLATE.md` files are shapes rather than content — the
 first turn writes the real thing. Leave the templates in place: they are what an agent reads when
