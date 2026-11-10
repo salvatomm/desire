@@ -5,6 +5,10 @@ Entries state the changes, no explanation of why.
 
 ## 2026-11-10
 
+**`CLAUDE.md` is back, one line: `@AGENTS.md`** (`CLAUDE.md`, `template/memory/CLAUDE.md`) — a
+fresh Claude Code session loaded nothing without it. USER: *"argh i tried and it didn't load,
+let's add the CLAUDE.md back in (still just @AGENTS.md)"*.
+
 **Amp entry points and runtime boundaries** (`AGENTS.md`, `OPERATIONS.md`, `README.md`,
 `CLAUDE.md`, `.github/lint.py`, `template/README.md`, `.agents/skills/pr-shepherd/`,
 `.agents/skills/brief/`, `template/memory/`) — Daylight
