@@ -80,8 +80,8 @@ the work. React on the comment or the body itself, with
 `add_reply_to_pull_request_comment`'s on a review comment.
 
 ## Matching an attribution footer
-Every entry of AGENT_FOOTERS is current: removing one whose runtime is still in use makes every post
-carrying it read as USER's own unanswered question.
+AGENT_FOOTERS includes markers on existing posts, even if their harness is no longer used:
+removing one can make an agent's reply read as USER's unanswered question.
 
 A reply from USER counts as an agent's when its last line is one of AGENT_FOOTERS — as the whole
 line, or inside the HTTPS *target* of a Markdown link on it (which is how a URL token matches the
@@ -89,10 +89,9 @@ footer wrapping it). A link's *label* never counts, since the label is the half 
 accepting it would let any destination silence a thread; nor does a marker in prose, which is a
 human writing about the convention. This is how the adopted PRs read.
 
-A runtime whose footer links to a shareable session snapshot puts the URL token in AGENT_FOOTERS the
-way `claude.ai/code` is, rather than relying on the label; the snapshot is opened and reviewed
-before it is linked, and an internal session or thread ID is not a URL and must never be turned into
-one.
+A harness whose footer links to a shareable session snapshot puts its URL token in AGENT_FOOTERS
+rather than relying on the label; the snapshot is opened and reviewed before it is linked, and an
+internal session or thread ID is not a URL and must never be turned into one.
 
 ## The day PR
 - Opening a new day's PR first merges the previous one: whatever in its comment thread

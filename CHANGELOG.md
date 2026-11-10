@@ -3,10 +3,11 @@
 What landed on `main`, newest first — when each rule started binding, and what it replaced.
 Entries state the changes, no explanation of why.
 
-## 2026-10-29
+## 2026-11-10
 
 **Amp entry points and runtime boundaries** (`AGENTS.md`, `OPERATIONS.md`, `README.md`,
-`CLAUDE.md`, `.github/lint.py`, `template/README.md`, `.agents/skills/pr-shepherd/`) — Daylight
+`CLAUDE.md`, `.github/lint.py`, `template/README.md`, `.agents/skills/pr-shepherd/`,
+`.agents/skills/brief/`) — Daylight
 moves into `AGENTS.md` as an interactive-only section and its separate file is deleted. The obsolete
 `CLAUDE.md` entry point is removed; scheduled runs select Birdsong or Evening. The heartbeat fallback
 and its skill are removed. Amp setup covers global guidance, sibling skills and separately
@@ -17,7 +18,39 @@ Read-only discussion with no work or new durable directive requires no memory wr
 USER: *"update the prompts open a PR"*, *"let's remove that fallback altogether it's not needed
 anymore"*, *"let's remove the DAYLIGHT.md as a file and make it into a section of AGENTS.md"*,
 *"just remove the file altogether it's not needed anymore"* (on `CLAUDE.md`).
+Then Daylight drops its "Leave the plan" step and its interactive-only line, the opening drops the
+memory-loading and harness-setup lines, and Daylight names the `brief` and `spawn` skills. USER: *"that's useless for an agent to
+know let's drop it"*, *"you can mention the brief skill here"*, *"you can mention the spawn skill
+here"*, *"drop this bullet point it doesn't happen that often to have a day session just to leave
+work for the night, most of the time i want the work to happen straight away"*.
 Closes #201.
+
+## 2026-11-05
+
+**Five skills** (`.agents/skills/`, `.claude/skills/`,
+`.github/workflows/lint.yml`) — `pr-status` measures a pull request live and gives one verdict;
+`remerge` merges a target branch into a pull request's branch locally, never pushing;
+`post-check` lints a draft before it is posted; `work-notes` lists the items a turn touched with no
+`WORK/` log line and lints the notes; `rules-edit` is the checklist for a rules PR, with a diff
+check for installation values. CI runs each skill's tests. USER: *"look at all our previous
+interactions in memory and desire repos then open a new desire PR with skills that would speed up
+and improve our future work"*.
+
+**The brief skill** (`.agents/skills/brief/`, `.claude/skills/`) — USER's intent turned into a
+prompt a fresh session can run, posted for a 🚀 instead of run: an issue brief (the change in
+mathematical terms, slices with their review cost, checks, `TODO.md` boxes) and an experiment brief
+(hypothesis, the refuting number, the decision it buys, budget, what is recorded). Binds nothing: a
+session loads it when asked for a brief. USER: *"i keep hearing people (including anthropic
+engineers) say i shouldn't be prompting you directly i should ask you to prompt yourself, how do i
+do that in the context of discopy-next development and research on the wiki?"*, then *"yes draft
+the brief skill"*.
+
+## 2026-10-29
+
+**Attribution is harness-agnostic** (`AGENTS.md`, `OPERATIONS.md`, `template/memory/`) — posts
+identify their actual harness; installation-specific markers live in `AGENT_FOOTERS`, not in
+the prompt, script or test expectations. USER: *"can we make the prompt and script harness
+agnostic instead?"*. Ruling: #199.
 
 ## 2026-10-28
 
