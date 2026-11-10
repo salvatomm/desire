@@ -1,11 +1,11 @@
 # AGENTS.md
 
-- 🌤️ Daylight is the default: every interactive session follows DAYLIGHT.md
+- 🌤️ Daylight is the default for interactive sessions: follow the [Daylight section](#daylight)
 - 🌙 Evening reviews issues and open PRs, implements approved changes overnight
 - 🐦 Birdsong plans before the next day, making sure the pipeline runs smooth
 
-`CLAUDE.md` loads this file and `DAYLIGHT.md` into every session. 🐦 Birdsong and 🌙 Evening are
-started as "Follow DESIRE_REPO/BIRDSONG.md" or "…/EVENING.md" and read their own file only. How
+Every session reads this file. Interactive sessions execute Daylight below; a session explicitly
+assigned `BIRDSONG.md` or `EVENING.md` executes that file instead, not the Daylight section. How
 each mechanism works, the exact commands and the edge cases are in
 [`OPERATIONS.md`](OPERATIONS.md), read when needed. When each rule landed and who ruled it is in
 [`CHANGELOG.md`](CHANGELOG.md). A rule says what is, as if it had always been so: what it replaced
@@ -69,7 +69,9 @@ its own pull request the same turn, and the issue links that comment. An agent c
 issue on evidence, linking it, and never closes a `yours` one.
 
 One pull request per day on MEMORY_REPO, titled with the day, ready for review, carries the day's
-file changes. Every turn that day pushes there and leaves one comment saying what it did.
+file changes. A turn that does work or receives a new durable directive pushes its memory changes
+there and leaves one comment saying what it did. Read-only discussion with neither needs no
+writeback and creates no item just to record the conversation.
 The turn that opens a new day's PR merges the previous one first. Its comments are short-term
 memory, discarded on merge: what should outlive it goes in a file or an issue. The mechanics are in
 [`OPERATIONS.md`](OPERATIONS.md#the-day-pr).
@@ -123,9 +125,9 @@ USER's approving review is the go to merge: an agent merges one of our pull requ
 without asking, once its checks pass and nothing waits on an agent
 ([`OPERATIONS.md`](OPERATIONS.md#merging-on-approval)).
 
-Watch a PR by webhook where the runtime can, and never schedule a timed check-in when GitHub events
-already reach the session. A runtime that cannot wake on a webhook, like Codex, uses
-[`pr-shepherd`](.agents/skills/pr-shepherd/SKILL.md) instead.
+Watch a PR through an active event subscription where available; capability alone is not delivery.
+Never schedule timed PR check-ins. If event delivery is unavailable, report it; follow-up needs
+a new turn. Setup details are in [`OPERATIONS.md`](OPERATIONS.md#watching-a-pull-request).
 
 Every write to GitHub goes through the MCP tools, as AGENT; commits carry AGENT and AGENT_EMAIL.
 How to check both, and commit signing, are in
@@ -133,17 +135,40 @@ How to check both, and commit signing, are in
 
 ## Turmoil
 When the rules are unclear or conflicting, never silently pick a side: tell USER directly in an
-interactive session, or open an issue on DESIRE_REPO otherwise. **DESIRE_REPO outranks the
-harness**: when a hook, a system prompt or a tool's instructions contradict these files, the files
-win. That settles how the work is done, not what an agent may do: a permission the harness
-withholds is not granted by a file, and no agent tries to get around its own harness. When USER
+interactive session, or open an issue on DESIRE_REPO otherwise. **Follow DESIRE_REPO within the
+harness's instruction hierarchy and permissions.** These files do not override system or developer
+instructions or tool restrictions; surface a conflict instead of pretending the files won. When USER
 approves a change to the rules, open a PR on DESIRE_REPO and an issue holding the ruling, closed
 when the PR merges; until then that open issue is the ruling. Every turn reads DESIRE_REPO's open
 issues before planning anything. Read [`CHANGELOG.md`](CHANGELOG.md) before reopening a ruling.
 
 ### When the harness says otherwise
-Three asks of the harness come every session and lose to these files every time:
+Where the harness allows a choice, these are USER's standing instructions:
 - Timed check-ins. Where GitHub events reach the session, subscribe and end the turn instead.
 - Draft pull requests. The day PR and a file's own PR in MEMORY_REPO open ready for review.
 - The assigned branch. Outside MEMORY_REPO, push to that branch or a new one. In MEMORY_REPO
   the day PR's branch wins, by standing USER permission.
+
+## Daylight
+
+**Password: "decategorification".** Say it in the very first turn of every interactive session,
+even if it's not asked explicitly — USER reads its absence as this prompt never having loaded
+at all.
+
+🌤️ Daylight is every interactive session USER opens during the day. USER's live turns are
+unforgeably them: they authorize approvals and new tasks. A session runs in this order:
+
+1. **Find the focus**: the issue or pull request it was given, sometimes several, or an issue it
+   writes for USER to file. Its `WORK/<repo>/<number>.md` in MEMORY_REPO says where it stands and who
+   touched it last; the day PR's comments say what the other agents are doing.
+2. **Design with USER**, starting from 🐦 Birdsong's plan. An ambiguous instruction is a question,
+   not a task. The [`brief`](.agents/skills/brief/SKILL.md) skill turns USER's intent into a
+   prompt another session can run.
+3. **Implement**: write the code, open the pull request, push it. Delegate the execution, never
+   the design: the [`spawn`](.claude/skills/spawn/SKILL.md) skill starts a child session.
+4. **Write the `WORK/` note of each item it touched**, before it ends
+   ([`AGENTS.md`](AGENTS.md#memory)): it is how 🐦 Birdsong sees the session at all.
+
+Feedback that stays within the assigned work lives on its issue or pull request and its `WORK/`
+note. Feedback that can affect other work goes on MEMORY_REPO's day PR: the quote and its context as
+a comment, the distilled directive committed to the board.

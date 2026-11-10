@@ -16,7 +16,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 SEED = ROOT / "template" / "memory"
 
 # The prompts a session loads, and the bytes all of them may take together.
-PROMPTS = ["CLAUDE.md", "BIRDSONG.md", "EVENING.md"]
+PROMPTS = ["AGENTS.md", "BIRDSONG.md", "EVENING.md"]
 BUDGET = 30_000
 
 # The MCP servers a deny list may name: a wrong server name denies nothing.
@@ -27,7 +27,7 @@ COPIES = [".claude/settings.json", ".claude/hooks/session-start.sh",
           ".agents/skills/sweep/sweep.py", ".agents/skills/sweep/test_sweep.py"]
 
 # The files that state rules, and the run of words two of them may not share.
-RULES = ["AGENTS.md", "DAYLIGHT.md", "BIRDSONG.md", "EVENING.md", "OPERATIONS.md",
+RULES = ["AGENTS.md", "BIRDSONG.md", "EVENING.md", "OPERATIONS.md",
          "template/memory/AGENTS.md", "template/memory/README.md",
          "template/memory/WORK/TEMPLATE.md", "template/memory/OTHERS/TEMPLATE.md",
          "template/memory/.github/PULL_REQUEST_TEMPLATE.md"]

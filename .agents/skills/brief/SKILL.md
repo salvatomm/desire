@@ -7,7 +7,7 @@ description: Turn USER's few lines of intent into a prompt that a fresh session 
 
 USER writes the intent; the agent writes the prompt; USER reads the prompt, which is cheaper than
 reading a diff; another session runs it. A brief is design, so it is never delegated
-([DAYLIGHT.md](../../../DAYLIGHT.md)), and writing one runs nothing: no code, no run, no branch.
+([Daylight](../../../AGENTS.md#daylight)), and writing one runs nothing: no code, no run, no branch.
 
 ## Before writing
 
