@@ -9,7 +9,10 @@ Entries state the changes, no explanation of why.
 `OPERATIONS.md`, `template/memory/.agents/skills/sweep/`) — the agents' work on a next repo is
 measured by the library's quality, drift stays a nightly reading. A scheduled run that finds
 nothing leaves one line on the day PR. A next-repo bug whose issue carries an unanswered ask from
-either installation is left alone. `sweep.py` exits 2 on any dropped connection. USER: *"the main
+either installation is left alone. `sweep.py` exits 2 on any dropped connection or unreadable
+file. Replaces: "their job is to keep the drift between the two small"; a run with nothing to do
+writing nothing; only a bug an open pull request addresses being left alone; exit 1 on a dropped
+connection. USER: *"the main
 test is whether all this work can get merged into one repo without creating a mess, adding
 features without sacrificing library quality"*, *"not sure why we would stop measuring, doesn't
 cost much"*, *"if the routine runs and finds nothing then it can write that down"*, and "hands

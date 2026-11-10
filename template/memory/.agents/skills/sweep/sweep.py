@@ -407,7 +407,7 @@ def main(arguments):
         findings = sweep(arguments[0], [int(n) for n in arguments[1:]], since,
                          config(find_config()))
     except (OSError, http.client.HTTPException) as error:
-        print(f"{arguments[0]}: GitHub unreadable, the sweep is incomplete and"
+        print(f"{arguments[0]}: unreadable (GitHub or a local file), the sweep is incomplete and"
               f" says nothing about this repo: {error}", file=sys.stderr)
         return 2
     print("\n".join(findings) if findings else "clean", file=sys.stderr)
