@@ -179,6 +179,25 @@ class AuditTest(unittest.TestCase):
         self.assertEqual(len(audit.incomplete), 2)
         self.assertFalse(any("closed-note" in f for f in audit.findings))
 
+    def test_unreadable_note_is_not_missing(self):
+        self.write("WORK/project/1.md", "placeholder")
+        (self.root / "WORK/project/1.md").write_bytes(b"\xff")
+        audit = self.audit()
+        audit.local()
+        audit.github(lambda repo, path: [item(1, author="bot")] if repo == "owner/project" else [])
+        self.assertFalse(any("missing-note" in f for f in audit.findings))
+
+    def test_read_date_on_a_wrapped_line(self):
+        self.write("WORK/project/1.md", NOTE.replace(" · read ", "\n  wrapped · read "))
+        audit = self.audit()
+        self.assertFalse(any("read-date" in f for f in audit.findings), audit.findings)
+
+    def test_memory_repo_notes_are_allowed(self):
+        self.write("WORK/memory/1.md", NOTE.replace("project#1", "memory#1"))
+        audit = lint.Audit(self.root, {**SETUP, "MEMORY_REPO": "owner/memory"})
+        audit.local()
+        self.assertFalse(any("note-repo" in f for f in audit.findings), audit.findings)
+
     def test_external_broken_vs_unverifiable(self):
         for status, broken in ((404, True), (410, True), (403, False), (429, False), (503, False)):
             audit = self.audit()

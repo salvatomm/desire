@@ -113,7 +113,8 @@ internal session or thread ID is not a URL and must never be turned into one.
 
 The memory linter checks note structure and links offline, with optional live GitHub
 comparison. Installation, commands and rule coverage are in
-[`template/memory/docs/lint.md`](template/memory/docs/lint.md).
+the docstring of
+[`template/memory/scripts/lint_memory.py`](template/memory/scripts/lint_memory.py).
 - One writer per file, one file per item, written by the turn that did the work. `<repo>` is the
   repository name alone and `<number>` is GitHub's, which numbers issues and pull requests in one
   space (`WORK/discopy/489.md`).

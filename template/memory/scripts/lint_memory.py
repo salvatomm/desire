@@ -1,5 +1,47 @@
 #!/usr/bin/env python3
-"""Lint memory conventions; see docs/lint.md for rules and exit codes."""
+"""Lint MEMORY_REPO's conventions: `WORK/` notes, the board and local links.
+
+Run from the memory clone, with `config.env` filled in (Python 3.10+):
+
+    python -m pip install -r requirements-lint.txt
+    python scripts/lint_memory.py                  # offline
+    python scripts/lint_memory.py --github         # also compare notes with GitHub
+    python scripts/lint_memory.py --external-links # also fetch HTTP links
+    python -m unittest discover -s tests -v
+
+Findings print as `file:line: rule: explanation`. Exit 0 means every requested check
+passed, 1 a violation, 2 an incomplete audit (an unreadable file or repository, an auth,
+rate-limit or network failure); findings collected before it are still printed.
+
+Offline checks, from the WORK template and DESIRE_REPO's Memory and One file per open
+item sections, which stay authoritative:
+- the board stays under 200 lines;
+- a note is `WORK/<configured repo name>/<number>.md` and its title names that item;
+- its fields are exactly `whose`, `does`, `needs`, `touches`, `blocks`, in order, each
+  answered, with a valid, non-future `read YYYY-MM-DD` on `whose`;
+- its log has one to five dated turns, newest first, each naming who and what;
+- no merge markers outside code;
+- local links (CommonMark links, images, autolinks, bare URLs) exist, stay inside the
+  repo, and a Markdown fragment matches a heading or an explicit anchor.
+`WORK/TEMPLATE.md` is a shape and exempt.
+
+`--github` reads every open issue and pull request of each WORK_REPO with `GITHUB_TOKEN`
+or `GH_TOKEN`, which needs read access to all of them: an open item we authored, adopted
+or a note cites needs a note, a closed one has none, and a read date older than the
+item's last update (whole UTC days) is stale. `--external-links` sends HEAD, then GET,
+with no token: 404 and 410 are findings, other failures leave the link unverified. A
+private URL's 404 can mean no access rather than deleted.
+
+CI runs the tests and the offline lint on pull requests and `main`; the online checks
+are a manual dispatch using the `MEMORY_LINT_TOKEN` secret. Existing violations are
+reported, never baselined: re-read an item before moving its date, check it live before
+deleting its note. Whether prose is true, or a board line cross-cutting, stays a review
+question; approvals, threads, `waiting` issues and the day PR stay the sweep's.
+
+An existing clone upgrades by copying, from desire's `main`, `scripts/lint_memory.py`,
+`tests/test_lint_memory.py`, `requirements-lint.txt` and `.github/workflows/lint.yml` to
+the same paths, then running the commands above.
+"""
 import argparse
 from collections import Counter
 from datetime import date
@@ -84,10 +126,20 @@ def anchors(text):
     return result
 
 
+def wrapped(lines, number):
+    """The indented lines that continue the bullet on line `number`."""
+    rest = []
+    for line in lines[number:]:
+        if not line.startswith("  "):
+            break
+        rest.append(line.strip())
+    return " " + " ".join(rest) if rest else ""
+
+
 class Audit:
     def __init__(self, root, setup):
         self.root, self.setup = root.resolve(), setup
-        self.findings, self.incomplete = [], []
+        self.findings, self.incomplete, self.unreadable = [], [], set()
         self.texts, self.notes, self.urls = {}, {}, {}
         self.repos = {}
         if not setup.get("AGENT") or not setup.get("WORK_REPOS"):
@@ -113,6 +165,7 @@ class Audit:
                 text = path.read_text(encoding="utf-8")
             except (OSError, UnicodeError) as error:
                 self.incomplete.append(f"{relative}: Markdown unreadable: {error}")
+                self.unreadable.add(relative)
                 continue
             self.texts[relative] = text
             lines = prose(text)
@@ -131,12 +184,14 @@ class Audit:
             self.add(path, 1, "note-path", "expected WORK/<repo>/<positive number>.md")
             return
         name, number = path.parts[1], int(path.stem)
-        if name not in self.repos:
-            self.add(path, 1, "note-repo", "repository is absent from WORK_REPOS")
+        memory = str(self.setup.get("MEMORY_REPO") or "").split("/")[-1]
+        if name not in self.repos and name != memory:
+            self.add(path, 1, "note-repo", "repository is absent from WORK_REPOS and MEMORY_REPO")
         expected = rf"# {re.escape(name)}#{number} — \S"
         if not lines or not re.match(expected, lines[0]):
             self.add(path, 1, "note-title", f"expected '# {name}#{number} — <summary>'")
-        fields = [(i, m.group(1), m.group(2)) for i, line in enumerate(lines, 1)
+        fields = [(i, m.group(1), m.group(2) + wrapped(lines, i))
+                  for i, line in enumerate(lines, 1)
                   if (m := FIELD.match(line)) and not LOG.match(line)]
         if [key for _, key, _ in fields] != list(FIELDS):
             self.add(path, 1, "note-fields", "expected exactly whose, does, needs, touches, blocks in order; live state belongs on GitHub")
@@ -211,7 +266,7 @@ class Audit:
                 required |= {int(n) for owner_repo, n in ITEM_URL.findall(text)
                              if owner_repo == repo and int(n) in opened}
             for number in sorted(required):
-                if (name, number) not in self.notes:
+                if (name, number) not in self.notes and Path(f"WORK/{name}/{number}.md") not in self.unreadable:
                     self.add(f"WORK/{name}/{number}.md", 1, "missing-note", f"open authored/adopted/cited item requires a note: {opened[number]['html_url']}")
             for (note_repo, number), (path, day) in self.notes.items():
                 if note_repo != name:
