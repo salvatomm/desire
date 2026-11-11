@@ -1,0 +1,22 @@
+name: lint
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - run: python3 .github/lint.py
+      - run: python3 -m unittest discover -s .agents/skills/sweep -p 'test_*.py'
+        working-directory: template/memory
+      - run: for d in .agents/skills/*/; do ! ls "$d"test_*.py >/dev/null 2>&1 || python3 -m unittest discover -s "$d" -p 'test_*.py' || exit 1; done
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python3 -m pip install -r requirements-lint.txt
+        working-directory: template/memory
+      - run: python3 -m unittest discover -s tests -v
+        working-directory: template/memory

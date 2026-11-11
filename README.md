@@ -7,7 +7,7 @@
 Software engineering prompts inspired by the asymmetric board game Root:
 
 - 🐦 [Birdsong](BIRDSONG.md) plans, asynchronously, before the day starts
-- 🌤️ [Daylight](DAYLIGHT.md) activates in every interactive session you open
+- 🌤️ [Daylight](AGENTS.md#daylight) activates in every interactive session you open
 - 🌙 [Evening](EVENING.md) reviews and implements, overnight, what you approved
 
 [AGENTS.md](AGENTS.md) is the operating base they all follow: the two layers of memory, what
@@ -31,24 +31,53 @@ session; the machinery behind them, needed only when something misbehaves, lives
    there and not here because this repo is public and the repos you work in need not be, and the
    sweep is seeded beside it because that is the file it reads.
 3) Integrate it to your model provider, adding the `memory` and `desire` repos alongside your work.
+   Use the [Amp setup](#amp) below, or have your harness explicitly read `AGENTS.md`. Configure scheduled
+   runs separately with `Follow <path-to-desire>/BIRDSONG.md` (before your day) and
+   `Follow <path-to-desire>/EVENING.md` (overnight), also loading the operating rules and memory.
+   Moving the files to another harness does not migrate the schedules; check their timezone and
+   access to every configured repo there.
 
 Nothing in this repo names you: your login, your agent's, and the repos you work in are all in that
 one `config.env`, in the repo that is yours. What is here is only the rules.
 
 **Pro tip:** Ask your 🌤️ Daylight session for its password to check it actually loaded the prompt.
 
-## Keep Codex pull requests listening
+## Amp
 
-Each Codex task that opens a pull request schedules its own heartbeat. It checks for your feedback
-and valid in-scope bug or style reports from anyone, acts on them, backs off while the pull request
-is idle, and deletes itself when the pull request merges or closes. No setup.
+Amp loads `AGENTS.md`. It does not
+discover guidance in sibling repositories. Put a loader in Amp's global instructions so it also
+applies when the working directory is a WORK_REPO. For orbs with the clones under
+`~/workspace/repos/`, use this, adjusting the paths to your layout:
+
+```text
+Before the first response or task action, read ~/workspace/repos/desire/AGENTS.md.
+For interactive sessions, follow its Daylight section. When explicitly requested, read
+~/workspace/repos/desire/BIRDSONG.md or ~/workspace/repos/desire/EVENING.md instead
+and do not execute Daylight. Read ~/workspace/repos/memory/AGENTS.md,
+~/workspace/repos/memory/config.env and ~/workspace/repos/memory/README.md,
+and the needed notes under ~/workspace/repos/memory/WORK/.
+If any required file is unavailable, say so.
+```
+
+Daylight is part of the shared operating file, but only interactive sessions execute it.
+Never place private config values in public guidance.
+
+Skills in the sibling clones need discovery too. Add their `.agents/skills/` directories to
+`amp.skills.path` and reload skills, or install them as personal/workspace skills. Confirm the
+expected names appear in the session's skill list. A script such as the sweep can instead be run
+by its explicit path; a linked skill can be read explicitly if it is not registered.
+
+Use Amp's orb setup mechanism for dependency installation; `.claude/` startup hooks and permission
+denies are Claude Code-specific. Follow [Identity and signing](OPERATIONS.md#identity-and-signing)
+for authorship without replacing Amp's managed signer, and
+[Watching a pull request](OPERATIONS.md#watching-a-pull-request) for event delivery.
 
 ## Verified commits
 
 **Optional** — everything above works without this. What it buys: every commit the agents push
-is authored by `AGENT` rather than a default identity, and signed so it shows the **Verified**
-badge — one glance tells a real agent commit from anything else. The SessionStart hook does
-both; wiring it up, on Claude Code on the web:
+is signed so it shows the **Verified** badge. Authorship is required independently of signing.
+Amp uses its managed signer; the setup below is only for Claude Code on the web, where the
+SessionStart hook handles both:
 
 1) Generate a passphrase-free SSH key: `ssh-keygen -t ed25519 -f ~/.ssh/agents_signing -N ''` —
    under `~/.ssh`, never in a checkout, where a broad `git add` could commit it.

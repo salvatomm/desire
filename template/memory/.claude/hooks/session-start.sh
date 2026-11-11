@@ -85,7 +85,7 @@ else
 fi
 
 # Timed self check-ins: denied here per AGENTS.md, see CHANGELOG.md for why.
-deny='["mcp__Claude_Code_Remote__send_later","mcp__Claude_Code_Remote__create_trigger","mcp__Claude_Code_Remote__update_trigger","mcp__Claude_Code_Remote__fire_trigger","ScheduleWakeup","CronCreate"]'
+deny='["mcp__claude-code-remote__send_later","mcp__claude-code-remote__create_trigger","mcp__claude-code-remote__update_trigger","mcp__claude-code-remote__fire_trigger","ScheduleWakeup","CronCreate"]'
 settings="$HOME/.claude/settings.json"
 mkdir -p "$HOME/.claude"
 [ -s "$settings" ] || echo '{}' > "$settings"

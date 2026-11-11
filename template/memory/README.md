@@ -1,26 +1,20 @@
 # The board
 
 State only — what is ready, what is blocked on what, what is behind, and only where it crosses more
-than one head. **Under 200 lines, rewritten every turn, never appended to**: a turn that would push
+than one item. **Under 200 lines, never appended to**: a turn that would push
 it over drops the oldest section instead of adding one.
 
-Four things do not belong here. A fact about a single pull request is that head's own
-[`WORK/<repo>/<number>.md`](WORK). A convention or a ruling is an open issue on DESIRE_REPO. Turn
-narration — anything carrying a timestamp and an agent name — is [`TURNS/<date>.md`](TURNS). What
-waits on USER, and what USER is working on, is [`USER_TODO.md`](USER_TODO.md).
+Four things do not belong here. **No line is about a single item**: that is the item's own
+[`WORK/<repo>/<number>.md`](WORK), and `lint.py --memory` reports a line naming exactly one. A convention or a ruling is an open issue on DESIRE_REPO. Turn
+narration — anything carrying a timestamp and an agent name — is a comment on the day PR. What
+waits on USER is an open `yours` or `waiting` issue on this repo.
 
-Last rewritten: never — this is the seed. Delete this line when the first turn writes a real one.
+Last updated: never — this is the seed. Delete this line when the first turn writes a real one.
 
-# Ruled, do not re-ask
+# Collisions and forced merge order
 
-<!-- Rulings USER has already made, one line each with the date. A turn that reopens one of these
-has cost a night. Empty until the first ruling. -->
-
-# The queue
-
-<!-- Not a list of heads — that is what WORK/ is. What goes here is what one head's file cannot
-say on its own: forced merge order, live file collisions between two heads, a lane that is blocked
-as a lane. -->
+<!-- What one item's file cannot say on its own: forced merge order, live file collisions between two items, a line of work that is blocked
+as a whole. -->
 
 # The open issues
 

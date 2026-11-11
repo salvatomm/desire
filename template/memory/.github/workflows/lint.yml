@@ -1,0 +1,68 @@
+name: Memory lint
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      github:
+        description: Compare work notes with GitHub (requires MEMORY_LINT_TOKEN)
+        type: boolean
+        default: false
+      external_links:
+        description: Check external HTTP links
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  local:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: requirements-lint.txt
+      - run: python -m pip install -r requirements-lint.txt
+      - run: python -m unittest discover -s tests -v
+      - run: python scripts/lint_memory.py
+
+  online:
+    if: github.event_name == 'workflow_dispatch' && (inputs.github || inputs.external_links)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements-lint.txt
+      - name: Audit requested sources
+        env:
+          GITHUB_TOKEN: ${{ secrets.MEMORY_LINT_TOKEN }}
+          CHECK_GITHUB: ${{ inputs.github }}
+          CHECK_LINKS: ${{ inputs.external_links }}
+        shell: bash
+        run: |
+          args=()
+          if [[ "$CHECK_GITHUB" == true ]]; then
+            if [[ -z "$GITHUB_TOKEN" ]]; then
+              echo 'MEMORY_LINT_TOKEN is required for cross-repository reads' >&2
+              exit 2
+            fi
+            args+=(--github)
+          fi
+          if [[ "$CHECK_LINKS" == true ]]; then
+            args+=(--external-links)
+          fi
+          python scripts/lint_memory.py "${args[@]}"
